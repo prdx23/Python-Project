@@ -1,7 +1,9 @@
 import pygame
 pygame.init()
 
-brakespeed = 0.05
+#temporary values, to be changed later
+brakespeed = 0.5
+maxspeed = 5
 
 class player():
 
@@ -10,8 +12,8 @@ class player():
 
         self.x = 0.0
         self.y = 0.0
-        self.h = 20
-        self.w = 20
+        self.h = 25
+        self.w = 25
         self.speedx = 0.0
         self.speedy = 0.0
         self.health = 100.0
@@ -21,20 +23,20 @@ class player():
         self.powerup2 = False
         self.powerup3 = False
 
-        self.image = pygame.image.load('player.png')
+        self.image = pygame.image.load('images/player.png')
         self.image = pygame.transform.scale(self.image, (self.w, self.h))
 
     def move(self,direction):
         #set initial speed according to direction
 
         if direction == 'up':
-            self.speedy = -5
+            self.speedy = -maxspeed
         elif direction == 'down':
-            self.speedy = 5
+            self.speedy = maxspeed
         elif direction == 'left':
-            self.speedx = -5
+            self.speedx = -maxspeed
         elif direction == 'right':
-            self.speedx = 5      
+            self.speedx = maxspeed     
 
     def inertia(self):
         #constantly reduce speed till it is zero for smooth motion
@@ -59,4 +61,20 @@ class player():
 
     def interact():
         pass
+    
+
+class wall():
+
+    def __init__(self):
+        #initialize all variables
+
+        self.x = 0.0
+        self.y = 0.0
+        self.h = 30
+        self.w = 30
+
+        self.can_collide = True
+
+        self.image = pygame.image.load('images/wall.png')
+        self.image = pygame.transform.scale(self.image, (self.w, self.h))
     
