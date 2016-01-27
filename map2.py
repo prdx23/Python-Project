@@ -18,6 +18,9 @@ def message(msg,color,mesx,mesy):
     screen = font.render(msg,True,color)
     gameDisplay.blit(screen,[mesx,mesy])
 
+
+
+
 class gamemap2:
     def __init__(self):
         self.map2_x = 0
@@ -75,6 +78,7 @@ def gameloop2():
         if pressed_keys[pygame.K_DOWN] == True:
             player2.move('down')
             
+ 
 
         is_collided = False
         for obj in objects:
