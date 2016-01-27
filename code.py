@@ -635,6 +635,51 @@ def move_all(dir,mapt,objs):
     
     return mapt,objs
 
+def reset_map(mapt,objs,display,typ):
+    
+    if typ == 'display':
+        reset_x = display['x']
+        reset_y = display['y']
+    elif typ == 'zero':
+        reset_x = 0
+        reset_y = 0
+
+    while mapt['x'] < reset_x:
+        mapt['x'] += 30
+        for o in objs:
+            if o.name == 'wall':
+                o.x += 30              
+            elif o.name == 'line':
+                o.x1 += 30
+                o.x2 += 30
+    while mapt['x'] > reset_x:
+        mapt['x'] -= 30
+        for o in objs:
+            if o.name == 'wall':
+                o.x -= 30              
+            elif o.name == 'line':
+                o.x1 -= 30
+                o.x2 -= 30
+
+    while mapt['y'] < reset_y:
+        mapt['y'] += 30
+        for o in objs:
+            if o.name == 'wall':
+                o.y += 30              
+            elif o.name == 'line':
+                o.y1 += 30
+                o.y2 += 30
+    while mapt['y'] > reset_y:
+        mapt['y'] -= 30
+        for o in objs:
+            if o.name == 'wall':
+                o.y -= 30              
+            elif o.name == 'line':
+                o.y1 -= 30
+                o.y2 -= 30
+    return mapt,objs
+            
+
 def editloop():
 
     objs = []
@@ -657,10 +702,10 @@ def editloop():
         'x' : 240,
         'y' : 30,
     }
-    
     #gridmode = False
     
     selected_object = 'none'
+    line_type = 'none'
     linepoint1 = False
     mousepress = False
     quit = False
@@ -668,7 +713,7 @@ def editloop():
 
         #events---------------------------------------------------------------------------------------------------
         for event in pygame.event.get():
-        
+           
             # event - quit
             if event.type == pygame.QUIT:
                 quit = True
@@ -680,7 +725,8 @@ def editloop():
                 #toggles fulscreen mode when pressing esc
                 if event.key == pygame.K_ESCAPE:
                     pygame.display.toggle_fullscreen()
-
+                if event.key == pygame.K_r:
+                    mapt,objs = reset_map(mapt,objs,display,'display')
                 # if event.key == pygame.K_g:
                 #     if gridmode == False:
                 #         gridmode = True
@@ -690,12 +736,23 @@ def editloop():
 
                 if event.key == pygame.K_w:
                     selected_object = 'wall'
-                if event.key == pygame.K_l:
-                    selected_object = 'line'
-                if event.key == pygame.K_p:
+                elif event.key == pygame.K_p:
                     selected_object = 'player'
-                if event.key == pygame.K_SPACE:
+                elif event.key == pygame.K_SPACE:
                     selected_object = 'eraser'
+
+
+                if event.key == pygame.K_l:
+                    line_type = 'light'
+                    selected_object = 'line'
+                elif event.key == pygame.K_a:
+                    line_type = 'answer'
+                    selected_object = 'line'
+                elif event.key == pygame.K_v:
+                    line_type = 'visual'
+                    selected_object = 'line'
+         
+
                 if event.key == pygame.K_LEFT:
                     mapt,objs = move_all('left',mapt,objs)
                 if event.key == pygame.K_RIGHT:
@@ -715,6 +772,7 @@ def editloop():
 
 
                 if event.key == pygame.K_s:
+                    mapt,objs = reset_map(mapt,objs,display,'zero')
                     l1 = '0 ' + str(plyrx) + ' ' + str(plyry) +' ' + str(mapt['w']) + ' ' + str(mapt['h']) + '\n'
                     f = open('maps/level1.txt','w+')
                     f.seek(0,0)
@@ -728,6 +786,7 @@ def editloop():
                         f.write(l)
 
                     f.close()
+                    quit = True
 
                     
             if event.type == pygame.MOUSEBUTTONUP:
@@ -736,7 +795,9 @@ def editloop():
 
         #erase whole display
         gameDisplay.fill(white)
-
+        message('Selected : '+selected_object,black,300,300,font)
+        message('Line type : '+line_type,black,300,350,font)
+     
         #draw already drawn objects first
         for o in objs:
             if o.name == 'wall':
@@ -748,49 +809,61 @@ def editloop():
         my = mcoords[1]
         mx , my = snap(mx,my)
 
-        if selected_object == 'wall':
-            wall1.x = mx
-            wall1.y = my
-
-            if mousepress == True:
-                #add wall to objects list
-                wl = wall(wall1.x,wall1.y)
-                objs.append(wl)
-            
-            #draw temp wall
-            gameDisplay.blit(wall1.image,(wall1.x,wall1.y))
-            
-
-        if selected_object == 'line':
-            if linepoint1 == False:
-                line1.x1 = mx
-                line1.y1 = my   
+        
+        if (mx >= mapt['x'] and mx < (mapt['x'] + mapt['w'])) and \
+           (my >= mapt['y'] and my < (mapt['y'] + mapt['h'])):
+        
+            if selected_object == 'wall':
+                wall1.x = mx
+                wall1.y = my
 
                 if mousepress == True:
-                    linepoint1 = True
-
-                #draw point 1 , first point of the line    
-                pygame.draw.circle(gameDisplay,green,(line1.x1,line1.y1),3,0)
-
-            else:
-                line1.x2 = mx
-                line1.y2 = my
-
-                #draw temp line with both points
-                pygame.draw.circle(gameDisplay,green,(line1.x1,line1.y1),3,0)
-                pygame.draw.circle(gameDisplay,green,(line1.x2,line1.y2),3,0)
-                pygame.draw.line(gameDisplay,blue,(line1.x1,line1.y1),(line1.x2,line1.y2),1)   
+                    #add wall to objects list
+                    wl = wall(wall1.x,wall1.y)
+                    objs.append(wl)
                 
-                if mousepress == True:
-                    linepoint1 = False
-                    ln = line(line1.x1,line1.y1,line1.x2,line1.y2)
-                    objs.append(ln)
+                #draw temp wall
+                gameDisplay.blit(wall1.image,(wall1.x,wall1.y))
+                
 
-        if selected_object == 'player':
-            pygame.draw.circle(gameDisplay,green,mcoords,3,0)
-            if mousepress == True:
-                plyrx = mcoords[0]
-                plyry = mcoords[1]
+            if selected_object == 'line':
+                if line_type == 'light':
+                    line1.id = 2
+                if line_type == 'visual':
+                    line1.id = 3
+                if line_type == 'answer':
+                    line1.id = 4
+                    
+                if linepoint1 == False:
+                    line1.x1 = mx
+                    line1.y1 = my   
+
+                    if mousepress == True:
+                        linepoint1 = True
+
+                    #draw point 1 , first point of the line    
+                    pygame.draw.circle(gameDisplay,green,(line1.x1,line1.y1),3,0)
+
+                else:
+                    line1.x2 = mx
+                    line1.y2 = my
+
+                    #draw temp line with both points
+                    pygame.draw.circle(gameDisplay,green,(line1.x1,line1.y1),3,0)
+                    pygame.draw.circle(gameDisplay,green,(line1.x2,line1.y2),3,0)
+                    pygame.draw.line(gameDisplay,red,(line1.x1,line1.y1),(line1.x2,line1.y2),3)   
+                    
+                    if mousepress == True:
+                        linepoint1 = False
+                        ln = line(line1.x1,line1.y1,line1.x2,line1.y2)
+                        ln.id = line1.id
+                        objs.append(ln)
+
+            if selected_object == 'player':
+                pygame.draw.circle(gameDisplay,green,mcoords,3,0)
+                if mousepress == True:
+                    plyrx = mcoords[0]
+                    plyry = mcoords[1]
 
         mousepress = False
         
@@ -816,7 +889,14 @@ def editloop():
         #draw all light collision lines
         for o in objs:
             if o.name == 'line':
-                pygame.draw.line(gameDisplay,blue,(o.x1,o.y1),(o.x2,o.y2),2)
+                if o.id == 2:
+                    pygame.draw.line(gameDisplay,blue,(o.x1,o.y1),(o.x2,o.y2),2)
+                if o.id == 3:
+                    pygame.draw.line(gameDisplay,black,(o.x1,o.y1),(o.x2,o.y2),2)
+                if o.id == 4:
+                    pygame.draw.line(gameDisplay,green,(o.x1,o.y1),(o.x2,o.y2),2)
+
+                # pygame.draw.line(gameDisplay,blue,(o.x1,o.y1),(o.x2,o.y2),2)
 
 
         #draw map origin
