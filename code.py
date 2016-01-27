@@ -6,33 +6,95 @@ pygame.init()
 
 #global variables
 fps = 60
-display_width = 1366
-display_height = 768
+display_width = 1700
+display_height =1000
 player1 = player()
 map1 = gamemap(display_width,display_height)
 objects = [] 
 lines = []
 mode = ''
 
+new_game = buttons(300,600,150,55)
+exit = buttons(600,600,150,55)
+pause_but = buttons(1300,0,150,55)
+cont = buttons(300,600,150,55)
+edit = buttons(450,700,290,55)
+
+
 #color variables
 black = (0,0,0)
 white = (255,255,255)
 blue=(0,0,255)
 red=(255,0,0)
+green = (0,255,0)
+hover_green = (0,100,0)
+hover_blue = (0,0,100)
+hover_red = (100,0,0)
 
 # main pygame variables
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 #pygame.display.toggle_fullscreen()
 clock = pygame.time.Clock()
-font = pygame.font.SysFont(None,50)
-
+font = pygame.font.SysFont(None,40)
+font1 = pygame.font.SysFont(None,80)
+pause = True
 def menu():
     pass
 
-def message(msg,color,mesx,mesy):
+def message(msg,color,mesx,mesy,f):
     
-    screen = font.render(msg,True,color)
+    screen = f.render(msg,True,color)
     gameDisplay.blit(screen,[mesx,mesy])
+
+def button(obj,msg,main_color,change_color,txt_col,action=None):
+
+
+    mouse = pygame.mouse.get_pos()
+    click= pygame.mouse.get_pressed()
+    print click
+    if ((obj.x+obj.w) >=mouse[0] >=obj.x ) and ((obj.y+obj.h) >= mouse[1] >=(obj.y)):
+        pygame.draw.rect(gameDisplay,change_color,(obj.x,obj.y,obj.w,obj.h))
+        if click[0]==1 and action!=None:
+            if action=="startgame":
+                gameinit()
+                gameloop()
+            elif action=='paused':
+                global pause
+                pause = True
+                paused()
+            elif action == 'cont':
+                unpause()
+            elif action == "edit":
+                editloop()
+            elif action == "exit":
+                gameexit()
+    else:
+        pygame.draw.rect(gameDisplay,main_color,(obj.x,obj.y,obj.w,obj.h))
+    message(msg,txt_col,obj.x,obj.y,font)
+def unpause():
+    global pause
+    pause=False
+
+def paused():
+    
+    while pause:
+
+        gameDisplay.fill(black)
+        for event in pygame.event.get():
+            #print(event)
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+                
+        message('PAUSED',blue,750,300,font1)
+     
+        button(cont,"continue",blue,hover_blue,black,'cont')
+        button(exit,"exit",red,hover_red,black,'exit')
+
+        pygame.display.update()
+        clock.tick(60)
+
+
 def gameintro():
     start = True
     load=0
@@ -54,12 +116,15 @@ def gameintro():
                  
          gameDisplay.fill(black)
          if load ==1:
-              message('LOADING...',red,500,500)
+              message('LOADING...',red,500,700)
               pygame.display.update()
-         message('WELCOME TO THE BEST GAME EVER',blue,300,500)
-         message('PRESS s TO START THE GAME',white,400,700)
-            
-           
+         message('WELCOME TO THE BEST GAME EVER',blue,300,300,font1)
+         message('PRESS s TO START THE GAME',white,400,500,font1)
+
+         button(new_game,"START",blue,hover_blue,black,'startgame')
+         button(exit,"EXIT",red,hover_red,black,'exit')
+         button(edit,"Make custom levels",green,hover_green,black,'edit')
+
          pygame.display.update()
          clock.tick(60)
 
@@ -69,6 +134,7 @@ def gameinit():
 def gameloop():
    
     quit = False
+    global pause
     
     while quit == False:
 
@@ -80,6 +146,7 @@ def gameloop():
             # event - quit
             if event.type == pygame.QUIT:
                 quit = True
+                gameexit()
             if event.type == pygame.KEYDOWN:
 
                 #close game if backspace is pressed
@@ -91,6 +158,7 @@ def gameloop():
                     pygame.display.toggle_fullscreen()
                 if event.key == pygame.K_o:
                     is_O_pressed = True
+               
                     
                     
 
@@ -107,8 +175,12 @@ def gameloop():
             player1.move('up')
         if pressed_keys[pygame.K_DOWN] == True:
             player1.move('down')
-        
-        
+        if pressed_keys[pygame.K_p] == True:
+            pause = True
+            paused()
+   
+           
+            
         mcoords = point(pygame.mouse.get_pos()[0] ,pygame.mouse.get_pos()[1] )      
 
 
@@ -129,6 +201,11 @@ def gameloop():
         
         if is_collided == False:
             #player is not touching anything
+            print player1.x
+            if player1.x>600:
+                import map2
+
+
 
             if player1.speedx > 0:
                 #player moving towards right
@@ -407,7 +484,7 @@ def gameloop():
 
         
 	    #map draw-----------------------------------------------------------------------------------------------------
-        
+        button(pause_but,"pause",blue,hover_blue,black,'paused')
         pygame.display.update()
         clock.tick(fps)
 

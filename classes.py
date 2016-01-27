@@ -199,3 +199,17 @@ class shop:
         self.can_collide = True
         self.image = pygame.image.load('images/shop.png')
         self.image = pygame.transform.scale(self.image, (self.w, self.h))
+
+class buttons:
+    def __init__(self,x,y,w,h):
+        self.x = x
+        self.y = y
+        self.h = h
+        self.w = w
+
+
+
+
+
+
+
