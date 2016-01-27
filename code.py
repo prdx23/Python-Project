@@ -1,7 +1,10 @@
 import pygame
 import sys
 from classes import *
-
+from multiprocessing import Process
+ 
+from threading import Thread
+import time
 pygame.init()
 
 #global variables
@@ -51,7 +54,7 @@ def button(obj,msg,main_color,change_color,txt_col,action=None):
 
     mouse = pygame.mouse.get_pos()
     click= pygame.mouse.get_pressed()
-    print click
+    #print click
     if ((obj.x+obj.w) >=mouse[0] >=obj.x ) and ((obj.y+obj.h) >= mouse[1] >=(obj.y)):
         pygame.draw.rect(gameDisplay,change_color,(obj.x,obj.y,obj.w,obj.h))
         if click[0]==1 and action!=None:
@@ -136,6 +139,18 @@ def gameloop():
     quit = False
     global pause
     
+    #message("sfsd",black,200,200,font)
+    def disp(tim):
+        for i in range(0,10):
+            print i
+            time.sleep(tim)
+
+            message(str(i),black,500,500,font)
+     
+
+    Thread(target = disp, args = (1, )).start()
+    #Process(target=disp,args=(1,)).start()
+    
     while quit == False:
 
 
@@ -201,7 +216,7 @@ def gameloop():
         
         if is_collided == False:
             #player is not touching anything
-            print player1.x
+            #print player1.x
             if player1.x>600:
                 import map2
 
