@@ -150,7 +150,7 @@ def gameloop():
             message(str(i),black,500,500,font)
      
 
-    Thread(target = disp, args = (1, )).start()
+    #Thread(target = disp, args = (1, )).start()
     #Process(target=disp,args=(1,)).start()
     
     while quit == False:
@@ -185,8 +185,11 @@ def gameloop():
         #this event runs when any key is pressed
         pressed_keys = pygame.key.get_pressed()
         if pressed_keys[pygame.K_LEFT] == True:
+            print pygame.K_LEFT
             player1.move('left')
+
         if pressed_keys[pygame.K_RIGHT] == True:
+            print pygame.K_RIGHT
             player1.move('right')
         if pressed_keys[pygame.K_UP] == True:
             player1.move('up')
