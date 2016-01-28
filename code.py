@@ -51,19 +51,26 @@ c = True
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 #pygame.display.toggle_fullscreen()
 clock = pygame.time.Clock()
+
 font = pygame.font.SysFont("arial",35)
 font1 = pygame.font.SysFont("comicsansms",100)
+font2 = pygame.font.SysFont(None,20)
+
 pause = True
 def menu():
-    pass
+	pass
 
 def message(msg,color,mesx,mesy,f):
-    
-    screen = f.render(msg,True,color)
-    gameDisplay.blit(screen,[mesx,mesy])
+	
+	screen = f.render(msg,True,color)
+	gameDisplay.blit(screen,[mesx,mesy])
 
 
 
+def answer():
+    for line in lines:
+        if line.type == 'answer':
+            line.hidden = False
 
 def button(obj,msg,main_color,change_color,txt_col,action=None):
     a=''
@@ -106,46 +113,48 @@ def button(obj,msg,main_color,change_color,txt_col,action=None):
     #message("changed to:",black,300,300,font)
     message(a,black,300,300,font)
     message(msg,txt_col,obj.x,obj.y,font)
+
 def unpause():
-    global pause
-    pause=False
+	global pause
+	pause=False
 
 def chn_cont(action):
-    global c 
-    global save
-    while save:
-        outfile = open('control.txt','w+')
-        if action != "svchn":
-            print "enter"
-            for event in pygame.event.get():
-                #print(event)
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    quit()
-                if event.type == pygame.KEYDOWN:
-                    print "sd"
-                    print pygame.key.name(event.key)
-                    dic[action] = event.key
-                    print dic[action]
-                    #c= False
-                    outfile.write(str(action)+' '+str(event.key))
-                    outfile.write("uhuhkujhkjh")
-                    outfile.close()
-                    return
-                    
-                    #message("changed to:",black,300,300,font)
-                    #pygame.display.update()
-                    #clock.tick(60)
-        else:
-            
-            c = False
-            save = False
-               
-           
-    
+	global c 
+	global save
+	while save:
+		outfile = open('control.txt','w+')
+		if action != "svchn":
+			# print "enter"
+			for event in pygame.event.get():
+				#print(event)
+				if event.type == pygame.QUIT:
+					pygame.quit()
+					quit()
+				if event.type == pygame.KEYDOWN:
+					print "sd"
+					print pygame.key.name(event.key)
+					dic[action] = event.key
+					print dic[action]
+					#c= False
+					outfile.write(str(action)+' '+str(event.key))
+					outfile.write("uhuhkujhkjh")
+					outfile.close()
+					return
+					
+					#message("changed to:",black,300,300,font)
+					#pygame.display.update()
+					#clock.tick(60)
+		else:
+			
+			c = False
+			save = False
+			   
+		   
+	
 def control():
-    
-    while c:
+	
+	while c:
+
 
         gameDisplay.fill(white)
 
@@ -164,15 +173,17 @@ def control():
                
                             
 
-        pygame.display.update()
-        clock.tick(60)
+
+		pygame.display.update()
+		clock.tick(60)
 
 
 
 
 def paused():
-    
-    while pause:
+	
+	while pause:
+
 
         gameDisplay.fill(black)
         for event in pygame.event.get():
@@ -186,11 +197,12 @@ def paused():
         button(cont,"continue",blue,hover_blue,black,'cont')
         button(exit,"exit",red,hover_red,black,'exit')
 
-        pygame.display.update()
-        clock.tick(60)
+		pygame.display.update()
+		clock.tick(60)
 
 
 def gameintro():
+
     start = True
     load=0
     global mode
@@ -290,208 +302,209 @@ def gameloop():
         if pressed_keys[pygame.K_p] == True:
             pause = True
             paused()
+
+		   
+			
+		mcoords = point(pygame.mouse.get_pos()[0] ,pygame.mouse.get_pos()[1] )      
+
+
+		#logic------------------------------------------------------------------------------------------------------
+
+		is_collided = False
+		for obj in objects:
+			#check collision with every object on the map
+			if collide(player1,obj,map1.mapx,map1.mapy) == True:
+				is_collided = True
+				if obj.name == 'door':
+					if is_O_pressed == True:
+						obj.can_collide = False
+						is_O_pressed = False
+				break
+		
+			
+		
+		if is_collided == False:
+			#player is not touching anything
+			# print player1.x
+			if player1.x >= map1.map_edge_x:
+				
+				import map2
+
+
+
+			if player1.speedx > 0:
+				#player moving towards right
+
+				if player1.x < map1.redx2 :
+					#player is inside red box
+					map1.mapspeedx = 0
+				else:
+					#player is outside red box
+
+					if (-1*map1.mapx) + display_width < map1.map_edge_x:
+						#some portion of map is hidden to the right of the screen
+					
+						map1.mapspeedx = -1*player1.speedx 
+						player1.speedx = 0
+						#move map to left instead of moving player to right and stop the player
+
+					elif (-1*map1.mapx) + display_width == map1.map_edge_x:
+						#no portion of map left on the right of the screen
+
+						player1.speedx = -1*map1.mapspeedx
+						map1.mapspeedx = 0
+						#set player speed to reverse of map speed and stop map from moving
+
+			if player1.speedx < 0:
+				#player moving towards left
+			   
+				if player1.x > map1.redx1 :
+					#player is inside red box
+					map1.mapspeedx = 0
+				else:
+					#player is outside red box
+
+					if map1.mapx < 0:
+						#some portion of map is hidden to the left of the screen
+					
+						map1.mapspeedx = -1*player1.speedx 
+						player1.speedx = 0
+						#move map to right instead of moving player to left and stop the player
+
+					elif map1.mapx == 0:
+						#no portion of map left on the left of the screen
+						
+						player1.speedx = -1*map1.mapspeedx
+						map1.mapspeedx = 0
+						#set player speed to reverse of map speed and stop map from moving
+
+			if player1.speedy > 0:
+				#player moving downwards
+
+				if player1.y < map1.redy2 :
+					#player is inside red box
+					map1.mapspeedy = 0
+				else:
+					#player is outside red box
+
+					if (-1*map1.mapy) + display_height < map1.map_edge_y:
+						#some portion of map is hidden below the screen
+					
+						map1.mapspeedy = -1*player1.speedy 
+						player1.speedy = 0
+						#move map upwards instead of moving player downwards and stop the player
+
+					elif (-1*map1.mapy) + display_height == map1.map_edge_y:
+						#no portion of map left below the screen
+
+						player1.speedy = -1*map1.mapspeedy
+						map1.mapspeedy = 0
+						#set player speed to reverse of map speed and stop map from moving
+
+			if player1.speedy < 0:
+				#player moving upwards
+
+				if player1.y > map1.redy1 :
+					#player is inside red box
+					map1.mapspeedy = 0
+				else:
+					#player is outside red box
+
+					if map1.mapy < 0:
+						#some portion of map is hidden above the screen
+					
+						map1.mapspeedy = -1*player1.speedy 
+						player1.speedy = 0
+						#move map downward instead of moving player upward and stop the player
+
+					elif map1.mapy == 0:
+						#no portion of map left above the screen
+
+						player1.speedy = -1*map1.mapspeedy
+						map1.mapspeedy = 0
+						#set player speed to reverse of map speed and stop map from moving
+
+
+		else:
+			#player is touching something
+			
+			
+			if player1.speedx != 0:
+				#player moving in x axis
+
+				if player1.x <= map1.redx2 or player1.x >= map1.redx1:
+					#player is inside red box
+					player1.speedx *= -0.1 
+					map1.mapspeedx = 0
+				else:
+					#player is on red box
+
+					if ((-1*map1.mapx) + display_width < map1.map_edge_x) or (map1.mapx <0):
+						#map is not scrolled all the way
+					
+						map1.mapspeedx *= -0.1 
+						player1.speedx = 0
+						
+					elif ((-1*map1.mapx) + display_width == map1.map_edge_x) or (map1.mapx == 0):
+						#either of map edge is touching screen edge
+
+						player1.speedx *= -0.1
+						map1.mapspeedx = 0
+
+			if player1.speedy != 0:
+				#player moving in y axis
+
+				if player1.y <= map1.redy2 or player1.y >= map1.redy1 :
+					#player is inside red box
+					player1.speedy *= -0.1
+					map1.mapspeedy = 0
+				else:
+					#player is outside red box
+
+					if ((-1*map1.mapy) + display_height < map1.map_edge_y) or (map1.mapy < 0):
+						#map is not scrolled all the way
+					
+						map1.mapspeedy *= -0.1 
+						player1.speedy = 0
+						
+					elif ((-1*map1.mapy) + display_height == map1.map_edge_y) or (map1.mapy == 0):
+						#either of map edges is touching screen edge
+
+						player1.speedy *= -0.1
+						map1.mapspeedy = 0
+											   
+			player1.inertia()
+			map1.inertia()
+			player1.speedx = 0
+			player1.speedy = 0
+			map1.mapspeedx = 0
+			map1.mapspeedy = 0
+
+		player1.inertia()
+		map1.inertia()
+
+		#update location of lines with map just to check intersection
+		for l in lines:
+			l.x1 += map1.mapx
+			l.y1 += map1.mapy
+			l.x2 += map1.mapx
+			l.y2 += map1.mapy
+		#ipdate location of mouse just for calculations
+		#mcoords.x += map1.mapx
+		#mcoords.y += map1.mapy
+
+
+		gameDisplay.fill(white)
+		draw_map(map1.mapx,map1.mapy)
+		
+
+		#logic for line intersection
+		mcoords = point(pygame.mouse.get_pos()[0] ,pygame.mouse.get_pos()[1] )      
+		tempx = mcoords.x
+		tempy = mcoords.y 
+		tempcol = red
    
-           
-            
-        mcoords = point(pygame.mouse.get_pos()[0] ,pygame.mouse.get_pos()[1] )      
 
-
-        #logic------------------------------------------------------------------------------------------------------
-
-        is_collided = False
-        for obj in objects:
-            #check collision with every object on the map
-            if collide(player1,obj,map1.mapx,map1.mapy) == True:
-                is_collided = True
-                if obj.name == 'door':
-                    if is_O_pressed == True:
-                        obj.can_collide = False
-                        is_O_pressed = False
-                break
-        
-            
-        
-        if is_collided == False:
-            #player is not touching anything
-            print player1.x
-            if player1.x >= map1.map_edge_x:
-                
-                import map2
-
-
-
-            if player1.speedx > 0:
-                #player moving towards right
-
-                if player1.x < map1.redx2 :
-                    #player is inside red box
-                    map1.mapspeedx = 0
-                else:
-                    #player is outside red box
-
-                    if (-1*map1.mapx) + display_width < map1.map_edge_x:
-                        #some portion of map is hidden to the right of the screen
-                    
-                        map1.mapspeedx = -1*player1.speedx 
-                        player1.speedx = 0
-                        #move map to left instead of moving player to right and stop the player
-
-                    elif (-1*map1.mapx) + display_width == map1.map_edge_x:
-                        #no portion of map left on the right of the screen
-
-                        player1.speedx = -1*map1.mapspeedx
-                        map1.mapspeedx = 0
-                        #set player speed to reverse of map speed and stop map from moving
-
-            if player1.speedx < 0:
-                #player moving towards left
-               
-                if player1.x > map1.redx1 :
-                    #player is inside red box
-                    map1.mapspeedx = 0
-                else:
-                    #player is outside red box
-
-                    if map1.mapx < 0:
-                        #some portion of map is hidden to the left of the screen
-                    
-                        map1.mapspeedx = -1*player1.speedx 
-                        player1.speedx = 0
-                        #move map to right instead of moving player to left and stop the player
-
-                    elif map1.mapx == 0:
-                        #no portion of map left on the left of the screen
-                        
-                        player1.speedx = -1*map1.mapspeedx
-                        map1.mapspeedx = 0
-                        #set player speed to reverse of map speed and stop map from moving
-
-            if player1.speedy > 0:
-                #player moving downwards
-
-                if player1.y < map1.redy2 :
-                    #player is inside red box
-                    map1.mapspeedy = 0
-                else:
-                    #player is outside red box
-
-                    if (-1*map1.mapy) + display_height < map1.map_edge_y:
-                        #some portion of map is hidden below the screen
-                    
-                        map1.mapspeedy = -1*player1.speedy 
-                        player1.speedy = 0
-                        #move map upwards instead of moving player downwards and stop the player
-
-                    elif (-1*map1.mapy) + display_height == map1.map_edge_y:
-                        #no portion of map left below the screen
-
-                        player1.speedy = -1*map1.mapspeedy
-                        map1.mapspeedy = 0
-                        #set player speed to reverse of map speed and stop map from moving
-
-            if player1.speedy < 0:
-                #player moving upwards
-
-                if player1.y > map1.redy1 :
-                    #player is inside red box
-                    map1.mapspeedy = 0
-                else:
-                    #player is outside red box
-
-                    if map1.mapy < 0:
-                        #some portion of map is hidden above the screen
-                    
-                        map1.mapspeedy = -1*player1.speedy 
-                        player1.speedy = 0
-                        #move map downward instead of moving player upward and stop the player
-
-                    elif map1.mapy == 0:
-                        #no portion of map left above the screen
-
-                        player1.speedy = -1*map1.mapspeedy
-                        map1.mapspeedy = 0
-                        #set player speed to reverse of map speed and stop map from moving
-
-
-        else:
-            #player is touching something
-            
-            
-            if player1.speedx != 0:
-                #player moving in x axis
-
-                if player1.x <= map1.redx2 or player1.x >= map1.redx1:
-                    #player is inside red box
-                    player1.speedx *= -0.1 
-                    map1.mapspeedx = 0
-                else:
-                    #player is on red box
-
-                    if ((-1*map1.mapx) + display_width < map1.map_edge_x) or (map1.mapx <0):
-                        #map is not scrolled all the way
-                    
-                        map1.mapspeedx *= -0.1 
-                        player1.speedx = 0
-                        
-                    elif ((-1*map1.mapx) + display_width == map1.map_edge_x) or (map1.mapx == 0):
-                        #either of map edge is touching screen edge
-
-                        player1.speedx *= -0.1
-                        map1.mapspeedx = 0
-
-            if player1.speedy != 0:
-                #player moving in y axis
-
-                if player1.y <= map1.redy2 or player1.y >= map1.redy1 :
-                    #player is inside red box
-                    player1.speedy *= -0.1
-                    map1.mapspeedy = 0
-                else:
-                    #player is outside red box
-
-                    if ((-1*map1.mapy) + display_height < map1.map_edge_y) or (map1.mapy < 0):
-                        #map is not scrolled all the way
-                    
-                        map1.mapspeedy *= -0.1 
-                        player1.speedy = 0
-                        
-                    elif ((-1*map1.mapy) + display_height == map1.map_edge_y) or (map1.mapy == 0):
-                        #either of map edges is touching screen edge
-
-                        player1.speedy *= -0.1
-                        map1.mapspeedy = 0
-                                               
-            player1.inertia()
-            map1.inertia()
-            player1.speedx = 0
-            player1.speedy = 0
-            map1.mapspeedx = 0
-            map1.mapspeedy = 0
-
-        player1.inertia()
-        map1.inertia()
-
-        #update location of lines with map just to check intersection
-        for l in lines:
-            l.x1 += map1.mapx
-            l.y1 += map1.mapy
-            l.x2 += map1.mapx
-            l.y2 += map1.mapy
-        #ipdate location of mouse just for calculations
-        #mcoords.x += map1.mapx
-        #mcoords.y += map1.mapy
-
-
-        gameDisplay.fill(white)
-        draw_map(map1.mapx,map1.mapy)
-        
-
-        #logic for line intersection
-
-        tempx = mcoords.x
-        tempy = mcoords.y 
-        tempcol = red
-   
 
         final_point = point(0,0)
         intersection_point = point(0,0)
@@ -607,142 +620,146 @@ def gameloop():
 
 
 def gameexit():
-    #runs before closing the window
-    pygame.quit()
-    quit()
+	#runs before closing the window
+	pygame.quit()
+	quit()
 
 
 def draw(obj,x,y):
-    #used to draw any object sent to it on the screen
-    gameDisplay.blit(obj.image, (obj.x + x,obj.y + y))
+	#used to draw any object sent to it on the screen
+	gameDisplay.blit(obj.image, (obj.x + x,obj.y + y))
 
 def collide(plyr,obj,mapx,mapy):
 
-    if obj.can_collide == False :
-        return False
-    elif ( ((plyr.x + plyr.speedx) >= obj.x + mapx) and ((plyr.x + plyr.speedx) <= (obj.x + obj.w + mapx)) ) and \
-         ( ((plyr.y + plyr.speedy) >= obj.y + mapy) and ((plyr.y + plyr.speedy) <= (obj.y + obj.h + mapy)) ):
-        return True
-    elif ( ((plyr.x + plyr.w + plyr.speedx) >= obj.x + mapx) and ((plyr.x + plyr.w + plyr.speedx) <= (obj.x + obj.w + mapx)) ) and \
-         ( ((plyr.y + plyr.speedy) >= obj.y + mapy) and ((plyr.y + plyr.speedy) <= (obj.y + obj.h + mapy)) ):
-        return True
-    elif ( ((plyr.x + plyr.speedx) >= obj.x + mapx) and ((plyr.x + plyr.speedx) <= (obj.x + obj.w + mapx)) ) and \
-         ( ((plyr.y + plyr.h + plyr.speedy) >= obj.y + mapy) and ((plyr.y + plyr.h + plyr.speedy) <= (obj.y + obj.h + mapy)) ):
-        return True
-    elif ( ((plyr.x + plyr.w + plyr.speedx) >= obj.x + mapx) and ((plyr.x + plyr.w + plyr.speedx) <= (obj.x + obj.w + mapx)) ) and \
-         ( ((plyr.y + plyr.h + plyr.speedy) >= obj.y + mapy) and ((plyr.y + plyr.h + plyr.speedy) <= (obj.y + obj.h + mapy)) ):
-        return True
-    else:
-        return False
+	if obj.can_collide == False :
+		return False
+	elif ( ((plyr.x + plyr.speedx) >= obj.x + mapx) and ((plyr.x + plyr.speedx) <= (obj.x + obj.w + mapx)) ) and \
+		 ( ((plyr.y + plyr.speedy) >= obj.y + mapy) and ((plyr.y + plyr.speedy) <= (obj.y + obj.h + mapy)) ):
+		return True
+	elif ( ((plyr.x + plyr.w + plyr.speedx) >= obj.x + mapx) and ((plyr.x + plyr.w + plyr.speedx) <= (obj.x + obj.w + mapx)) ) and \
+		 ( ((plyr.y + plyr.speedy) >= obj.y + mapy) and ((plyr.y + plyr.speedy) <= (obj.y + obj.h + mapy)) ):
+		return True
+	elif ( ((plyr.x + plyr.speedx) >= obj.x + mapx) and ((plyr.x + plyr.speedx) <= (obj.x + obj.w + mapx)) ) and \
+		 ( ((plyr.y + plyr.h + plyr.speedy) >= obj.y + mapy) and ((plyr.y + plyr.h + plyr.speedy) <= (obj.y + obj.h + mapy)) ):
+		return True
+	elif ( ((plyr.x + plyr.w + plyr.speedx) >= obj.x + mapx) and ((plyr.x + plyr.w + plyr.speedx) <= (obj.x + obj.w + mapx)) ) and \
+		 ( ((plyr.y + plyr.h + plyr.speedy) >= obj.y + mapy) and ((plyr.y + plyr.h + plyr.speedy) <= (obj.y + obj.h + mapy)) ):
+		return True
+	else:
+		return False
 
 def load_map(name):
-    path = 'maps/' + name + '.txt'
-    f = open(path,'r')
+	path = 'maps/' + name + '.txt'
+	f = open(path,'r')
 
-    for l in f:
+	for l in f:
 
-        a = l.split()
-        print a[0]
-        if int(a[0]) == 0:
-            #id of first line
-            player1.x = float(a[1])
-            player1.y = float(a[2])
-            map1.map_edge_x = int(a[3])
-            map1.map_edge_y = int(a[4])
+		a = l.split()
+		print a[0]
+		if int(a[0]) == 0:
+			#id of first line
+			player1.x = float(a[1])
+			player1.y = float(a[2])
+			map1.map_edge_x = int(a[3])
+			map1.map_edge_y = int(a[4])
 
-        if int(a[0]) == 1:
-            #id of wall
-            wx = float(a[1])
-            wy = float(a[2])
-            wl = wall(wx,wy)
-            objects.append(wl)
+		if int(a[0]) == 1:
+			#id of wall
+			wx = float(a[1])
+			wy = float(a[2])
+			wl = wall(wx,wy)
+			objects.append(wl)
 
-        if int(a[0]) == 2:
-            #id of light line
-            lx1 = float(a[1])
-            ly1 = float(a[2])
-            lx2 = float(a[3])
-            ly2 = float(a[4])
-            ln = line(lx1,ly1,lx2,ly2)
-            ln.type = 'light'
-            ln.hidden = True
+		if int(a[0]) == 2:
+			#id of light line
+			lx1 = float(a[1])
+			ly1 = float(a[2])
+			lx2 = float(a[3])
+			ly2 = float(a[4])
+			ln = line(lx1,ly1,lx2,ly2)
+			ln.type = 'light'
+			# ln.hidden = True
 
-            if lx2 != lx1:
-                lm = (ly2-ly1)/(lx2-lx1)
-            else:
-                ln.is_vertical = True
-            
-            ln.slope = lm
-            ln.length = ((lx2-lx1)**2 + (ly2-ly1)**2 )**0.5
-            lines.append(ln)
+			if lx2 != lx1:
+				lm = (ly2-ly1)/(lx2-lx1)
+				ln.slope = lm
+				
+			else:
+				ln.slope = float("inf")
+				ln.is_vertical = True
+			
+			ln.length = ((lx2-lx1)**2 + (ly2-ly1)**2 )**0.5
+			lines.append(ln)
 
-        if int(a[0]) == 3:
-            #id of visual line
-            lx1 = float(a[1])
-            ly1 = float(a[2])
-            lx2 = float(a[3])
-            ly2 = float(a[4])
-            ln = line(lx1,ly1,lx2,ly2)
-            ln.type = 'visual'
-            ln.color = black
-            ln.id = 3
+		if int(a[0]) == 3:
+			#id of visual line
+			lx1 = float(a[1])
+			ly1 = float(a[2])
+			lx2 = float(a[3])
+			ly2 = float(a[4])
+			ln = line(lx1,ly1,lx2,ly2)
+			ln.type = 'visual'
+			ln.color = black
+			ln.id = 3
 
-            if lx2 != lx1:
-                lm = (ly2-ly1)/(lx2-lx1)
-            else:
-                ln.is_vertical = True
-            
-            ln.slope = lm
-            ln.length = ((lx2-lx1)**2 + (ly2-ly1)**2 )**0.5
-            lines.append(ln)
+			if lx2 != lx1:
+				lm = (ly2-ly1)/(lx2-lx1)
+				ln.slope = lm
+			else:
+				ln.is_vertical = True
+			
+			
+			ln.length = ((lx2-lx1)**2 + (ly2-ly1)**2 )**0.5
+			lines.append(ln)
 
-        if int(a[0]) == 4:
-            #id of answer line
-            lx1 = float(a[1])
-            ly1 = float(a[2])
-            lx2 = float(a[3])
-            ly2 = float(a[4])
-            ln = line(lx1,ly1,lx2,ly2)
-            ln.type = 'answer'
-            ln.hidden = True
-            ln.color = green
-            ln.id = 4
-            
-            if lx2 != lx1:
-                lm = (ly2-ly1)/(lx2-lx1)
-            else:
-                ln.is_vertical = True
-            
-            ln.slope = lm
-            ln.length = ((lx2-lx1)**2 + (ly2-ly1)**2 )**0.5
-            lines.append(ln)
+		if int(a[0]) == 4:
+			#id of answer line
+			lx1 = float(a[1])
+			ly1 = float(a[2])
+			lx2 = float(a[3])
+			ly2 = float(a[4])
+			ln = line(lx1,ly1,lx2,ly2)
+			ln.type = 'answer'
+			ln.hidden = True
+			ln.color = green
+			ln.id = 4
+			
+			if lx2 != lx1:
+				lm = (ly2-ly1)/(lx2-lx1)
+				ln.slope = lm
+			else:
+				ln.is_vertical = True
+			
+			
+			ln.length = ((lx2-lx1)**2 + (ly2-ly1)**2 )**0.5
+			lines.append(ln)
 
   
 def draw_map(x,y):
-    for obj in objects:
-        draw(obj,x,y)
+	for obj in objects:
+		draw(obj,x,y)
 
-    for line in lines:
-        if line.hidden == False:
-            pygame.draw.line(gameDisplay,line.color,(line.x1,line.y1),(line.x2,line.y2),2)
+	for line in lines:
+		if line.hidden == False:
+			pygame.draw.line(gameDisplay,line.color,(line.x1,line.y1),(line.x2,line.y2),2)
 
-    draw(player1,0,0)
+	draw(player1,0,0)
 
 
 
 def isBetween(a, b, c):
-    #copied from
-    # http://stackoverflow.com/questions/328107/how-can-you-determine-a-point-is-between-two-other-points-on-a-line-segment#
-    crossproduct = (c.y - a.y) * (b.x - a.x) - (c.x - a.x) * (b.y - a.y)
-    if abs(crossproduct) > 0.00001 : return False   # (or != 0 if using integers) ........ sys.float_info.epsilon
+	#copied from
+	# http://stackoverflow.com/questions/328107/how-can-you-determine-a-point-is-between-two-other-points-on-a-line-segment#
+	crossproduct = (c.y - a.y) * (b.x - a.x) - (c.x - a.x) * (b.y - a.y)
+	if abs(crossproduct) > 0.00001 : return False   # (or != 0 if using integers) ........ sys.float_info.epsilon
 
-    dotproduct = (c.x - a.x) * (b.x - a.x) + (c.y - a.y)*(b.y - a.y)
-    if dotproduct < 0 : return False
+	dotproduct = (c.x - a.x) * (b.x - a.x) + (c.y - a.y)*(b.y - a.y)
+	if dotproduct < 0 : return False
 
-    squaredlengthba = (b.x - a.x)*(b.x - a.x) + (b.y - a.y)*(b.y - a.y)
-    if dotproduct > squaredlengthba: return False
+	squaredlengthba = (b.x - a.x)*(b.x - a.x) + (b.y - a.y)*(b.y - a.y)
+	if dotproduct > squaredlengthba: return False
 
-    return True
+	return True
 
 
 
@@ -750,353 +767,366 @@ def isBetween(a, b, c):
 
 #--------------------------------level editor loop -------------------------------------------------
 def snap(mx,my):
-    while mx % 30 != 0:
-        mx -= 1
-    while my % 30 != 0:
-        my -= 1
-    return mx,my
+	while mx % 30 != 0:
+		mx -= 1
+	while my % 30 != 0:
+		my -= 1
+	return mx,my
 
-def move_all(dir,mapt,objs):
-    
-    cord = ''
-    value = 30
+def move_all(dir,mapt,objs,plyrx,plyry):
+	
+	cord = ''
+	value = 30
 
-    if dir == 'left':
-        cord = 'x' 
-        value = -30
-    if dir == 'right':
-        cord = 'x' 
-        value = 30
-    if dir == 'up':
-        cord = 'y' 
-        value = -30
-    if dir == 'down':
-        cord = 'y' 
-        value = 30
+	if dir == 'left':
+		cord = 'x' 
+		value = -30
+	if dir == 'right':
+		cord = 'x' 
+		value = 30
+	if dir == 'up':
+		cord = 'y' 
+		value = -30
+	if dir == 'down':
+		cord = 'y' 
+		value = 30
 
-    mapt[cord] += value
-    for o in objs:
-        if o.name == 'wall':
-            if cord == 'x':
-                o.x += value
-            if cord == 'y':
-                o.y += value
+	mapt[cord] += value
+	for o in objs:
+		if o.name == 'wall':
+			if cord == 'x':
+				o.x += value
+				plyrx += value
+			if cord == 'y':
+				o.y += value
+				plyry += value
 
-        elif o.name == 'line':
-            if cord == 'x':
-                o.x1 += value
-                o.x2 += value
-            if cord == 'y':
-                o.y1 += value
-                o.y2 += value
-            
-    
-    return mapt,objs
+		elif o.name == 'line':
+			if cord == 'x':
+				o.x1 += value
+				o.x2 += value
+			if cord == 'y':
+				o.y1 += value
+				o.y2 += value
+			
+	
+	return mapt,objs,plyrx,plyry
 
 def reset_map(mapt,objs,display,typ):
-    
-    if typ == 'display':
-        reset_x = display['x']
-        reset_y = display['y']
-    elif typ == 'zero':
-        reset_x = 0
-        reset_y = 0
+	
+	if typ == 'display':
+		reset_x = display['x']
+		reset_y = display['y']
+	elif typ == 'zero':
+		reset_x = 0
+		reset_y = 0
 
-    while mapt['x'] < reset_x:
-        mapt['x'] += 30
-        for o in objs:
-            if o.name == 'wall':
-                o.x += 30              
-            elif o.name == 'line':
-                o.x1 += 30
-                o.x2 += 30
-    while mapt['x'] > reset_x:
-        mapt['x'] -= 30
-        for o in objs:
-            if o.name == 'wall':
-                o.x -= 30              
-            elif o.name == 'line':
-                o.x1 -= 30
-                o.x2 -= 30
+	while mapt['x'] < reset_x:
+		mapt['x'] += 30
+		for o in objs:
+			if o.name == 'wall':
+				o.x += 30              
+			elif o.name == 'line':
+				o.x1 += 30
+				o.x2 += 30
+	while mapt['x'] > reset_x:
+		mapt['x'] -= 30
+		for o in objs:
+			if o.name == 'wall':
+				o.x -= 30              
+			elif o.name == 'line':
+				o.x1 -= 30
+				o.x2 -= 30
 
-    while mapt['y'] < reset_y:
-        mapt['y'] += 30
-        for o in objs:
-            if o.name == 'wall':
-                o.y += 30              
-            elif o.name == 'line':
-                o.y1 += 30
-                o.y2 += 30
-    while mapt['y'] > reset_y:
-        mapt['y'] -= 30
-        for o in objs:
-            if o.name == 'wall':
-                o.y -= 30              
-            elif o.name == 'line':
-                o.y1 -= 30
-                o.y2 -= 30
-    return mapt,objs
-            
+	while mapt['y'] < reset_y:
+		mapt['y'] += 30
+		for o in objs:
+			if o.name == 'wall':
+				o.y += 30              
+			elif o.name == 'line':
+				o.y1 += 30
+				o.y2 += 30
+	while mapt['y'] > reset_y:
+		mapt['y'] -= 30
+		for o in objs:
+			if o.name == 'wall':
+				o.y -= 30              
+			elif o.name == 'line':
+				o.y1 -= 30
+				o.y2 -= 30
+	return mapt,objs
+			
 
 def editloop():
-    global selected_object
-    objs = []
-    wall1 = wall(0,0)
-    line1 = line(0,0,0,0)
+	global selected_object
+	objs = []
+	wall1 = wall(0,0)
+	line1 = line(0,0,0,0)
 
-    plyrx = -100
-    plyry = -100
-    
-    mapt = {
-        'w' : 240,
-        'h' : 240,
-        'x' : 240,
-        'y' : 30,
-    }
+	plyrx = -100
+	plyry = -100
+	
+	mapt = {
+		'w' : 240,
+		'h' : 240,
+		'x' : 240,
+		'y' : 30,
+	}
 
-    display = {
-        'w' : 810,
-        'h' : 690,
-        'x' : 240,
-        'y' : 30,
-    }
-    #gridmode = False
-    
-    selected_object = 'none'
-    line_type = 'none'
-    linepoint1 = False
-    mousepress = False
-    quit = False
-    while quit == False:
+	display = {
+		'w' : 810,
+		'h' : 690,
+		'x' : 240,
+		'y' : 30,
+	}
+	#gridmode = False
+	
+	selected_object = 'none'
+	line_type = 'none'
+	linepoint1 = False
+	mousepress = False
+	quit = False
+	while quit == False:
 
-        #events---------------------------------------------------------------------------------------------------
-        for event in pygame.event.get():
-           
-            # event - quit
-            if event.type == pygame.QUIT:
-                quit = True
-            if event.type == pygame.KEYDOWN:
-                #close game if backspace is pressed
-                #(made this shortcut as game cannot be closed in full screen)
-                if event.key == pygame.K_BACKSPACE:
-                    quit = True
-                #toggles fulscreen mode when pressing esc
-                if event.key == pygame.K_ESCAPE:
-                    pygame.display.toggle_fullscreen()
-                if event.key == pygame.K_r:
-                    mapt,objs = reset_map(mapt,objs,display,'display')
-                # if event.key == pygame.K_g:
-                #     if gridmode == False:
-                #         gridmode = True
-                #     else:
-                #         gridmode = False
-
-
-                if event.key == pygame.K_w:
-                    selected_object = 'wall'
-                elif event.key == pygame.K_p:
-                    selected_object = 'player'
-                elif event.key == pygame.K_SPACE:
-                    selected_object = 'eraser'
+		#events---------------------------------------------------------------------------------------------------
+		for event in pygame.event.get():
+		   
+			# event - quit
+			if event.type == pygame.QUIT:
+				quit = True
+			if event.type == pygame.KEYDOWN:
+				#close game if backspace is pressed
+				#(made this shortcut as game cannot be closed in full screen)
+				if event.key == pygame.K_BACKSPACE:
+					quit = True
+				#toggles fulscreen mode when pressing esc
+				if event.key == pygame.K_ESCAPE:
+					pygame.display.toggle_fullscreen()
+				if event.key == pygame.K_r:
+					mapt,objs = reset_map(mapt,objs,display,'display')
+				# if event.key == pygame.K_g:
+				#     if gridmode == False:
+				#         gridmode = True
+				#     else:
+				#         gridmode = False
 
 
-                if event.key == pygame.K_l:
-                    line_type = 'light'
-                    selected_object = 'line'
-                elif event.key == pygame.K_a:
-                    line_type = 'answer'
-                    selected_object = 'line'
-                elif event.key == pygame.K_v:
-                    line_type = 'visual'
-                    selected_object = 'line'
-         
-
-                if event.key == pygame.K_LEFT:
-                    mapt,objs = move_all('left',mapt,objs)
-                if event.key == pygame.K_RIGHT:
-                    mapt,objs = move_all('right',mapt,objs)
-                if event.key == pygame.K_UP:
-                    mapt,objs = move_all('up',mapt,objs)
-                if event.key == pygame.K_DOWN:
-                    mapt,objs = move_all('down',mapt,objs)
-                if event.key == pygame.K_1:
-                    mapt['w'] += 30
-                if event.key == pygame.K_2:
-                    mapt['w'] -= 30
-                if event.key == pygame.K_3:
-                    mapt['h'] += 30
-                if event.key == pygame.K_4:
-                    mapt['h'] -= 30
+				if event.key == pygame.K_w:
+					selected_object = 'wall'
+				elif event.key == pygame.K_p:
+					selected_object = 'player'
+				elif event.key == pygame.K_SPACE:
+					selected_object = 'eraser'
 
 
-                if event.key == pygame.K_s:
-                    mapt,objs = reset_map(mapt,objs,display,'zero')
-                    l1 = '0 ' + str(plyrx) + ' ' + str(plyry) +' ' + str(mapt['w']) + ' ' + str(mapt['h']) + '\n'
-                    f = open('maps/level1.txt','w+')
-                    f.seek(0,0)
-                    f.write(l1)
+				if event.key == pygame.K_l:
+					line_type = 'light'
+					selected_object = 'line'
+				elif event.key == pygame.K_a:
+					line_type = 'answer'
+					selected_object = 'line'
+				elif event.key == pygame.K_v:
+					line_type = 'visual'
+					selected_object = 'line'
+		 
 
-                    for o in objs:
-                        if o.name == 'wall':
-                            l = str(o.id) + ' ' + str(o.x) + ' ' + str(o.y) + '\n'
-                        elif o.name == 'line':
-                            l = str(o.id) + ' ' + str(o.x1) + ' ' + str(o.y1) + ' ' + str(o.x2) + ' ' + str(o.y2) + '\n'
-                        f.write(l)
-
-                    f.close()
-                    quit = True
-
-                    
-            if event.type == pygame.MOUSEBUTTONUP:
-                mousepress = True
-    
-
-        #erase whole display
-        gameDisplay.fill(white)
-        message('Selected : '+selected_object,black,300,300,font)
-        message('Line type : '+line_type,black,300,350,font)
-     
-        #draw already drawn objects first
-        for o in objs:
-            if o.name == 'wall':
-                gameDisplay.blit(o.image,(o.x,o.y))
-        
-        #get mouse coords
-        mcoords = pygame.mouse.get_pos()
-        mx = mcoords[0]
-        my = mcoords[1]
-        mx , my = snap(mx,my)
-
-        
-        if (mx >= mapt['x'] and mx < (mapt['x'] + mapt['w'])) and \
-           (my >= mapt['y'] and my < (mapt['y'] + mapt['h'])):
-        
-            if selected_object == 'wall':
-                wall1.x = mx
-                wall1.y = my
-
-                if mousepress == True:
-                    #add wall to objects list
-                    wl = wall(wall1.x,wall1.y)
-                    objs.append(wl)
-                
-                #draw temp wall
-                gameDisplay.blit(wall1.image,(wall1.x,wall1.y))
-                
-
-            if selected_object == 'line':
-                if line_type == 'light':
-                    line1.id = 2
-                if line_type == 'visual':
-                    line1.id = 3
-                if line_type == 'answer':
-                    line1.id = 4
-                    
-                if linepoint1 == False:
-                    line1.x1 = mx
-                    line1.y1 = my   
-
-                    if mousepress == True:
-                        linepoint1 = True
-
-                    #draw point 1 , first point of the line    
-                    pygame.draw.circle(gameDisplay,green,(line1.x1,line1.y1),3,0)
-
-                else:
-                    line1.x2 = mx
-                    line1.y2 = my
-
-                    #draw temp line with both points
-                    pygame.draw.circle(gameDisplay,green,(line1.x1,line1.y1),3,0)
-                    pygame.draw.circle(gameDisplay,green,(line1.x2,line1.y2),3,0)
-                    pygame.draw.line(gameDisplay,red,(line1.x1,line1.y1),(line1.x2,line1.y2),3)   
-                    
-                    if mousepress == True:
-                        linepoint1 = False
-                        ln = line(line1.x1,line1.y1,line1.x2,line1.y2)
-                        ln.id = line1.id
-                        objs.append(ln)
-
-            if selected_object == 'player':
-                pygame.draw.circle(gameDisplay,green,mcoords,3,0)
-                if mousepress == True:
-                    plyrx = mcoords[0]
-                    plyry = mcoords[1]
-
-        mousepress = False
-        
-        #draw display border
-        pygame.draw.line(gameDisplay,black,
-            (display['x'],display['y']),(display['x'] + display['w'],display['y']),1)
-        pygame.draw.line(gameDisplay,black,
-            (display['x'],display['y']),(display['x'],display['y']+ display['h']),1)
-        pygame.draw.line(gameDisplay,black,
-            (display['x'],display['y']+display['h']),(display['x']+ display['w'],display['y']+ display['h']),1)
-        pygame.draw.line(gameDisplay,black,
-            (display['x']+display['w'],display['y']),(display['x']+ display['w'],display['y']+ display['h']),1)
+				if event.key == pygame.K_LEFT:
+					mapt,objs,plyrx,plyry = move_all('left',mapt,objs,plyrx,plyry)
+				if event.key == pygame.K_RIGHT:
+					mapt,objs,plyrx,plyry = move_all('right',mapt,objs,plyrx,plyry)
+				if event.key == pygame.K_UP:
+					mapt,objs,plyrx,plyry = move_all('up',mapt,objs,plyrx,plyry)
+				if event.key == pygame.K_DOWN:
+					mapt,objs,plyrx,plyry = move_all('down',mapt,objs,plyrx,plyry)
+				if event.key == pygame.K_1:
+					mapt['w'] += 30
+				if event.key == pygame.K_2:
+					mapt['w'] -= 30
+				if event.key == pygame.K_3:
+					mapt['h'] += 30
+				if event.key == pygame.K_4:
+					mapt['h'] -= 30
 
 
-        #draw grid
-        for x in range(0,display['w'],30):
-            pygame.draw.line(gameDisplay,grey,
-                (x+ display['x'], display['y']),(x+ display['x'],display['y']+ display['h']),1)
-        for y in range(0,display['h'],30):
-            pygame.draw.line(gameDisplay,grey,
-                ( display['x'],y+ display['y']),(display['x']+ display['w'],y+ display['y']),1)        
+				if event.key == pygame.K_s:
+					mapt,objs = reset_map(mapt,objs,display,'zero')
+					l1 = '0 ' + str(plyrx- display['x']) + ' ' + str(plyry- display['y']) +' ' + str(mapt['w']) + ' ' + str(mapt['h']) + '\n'
+					f = open('maps/level1.txt','w+')
+					f.seek(0,0)
+					f.write(l1)
 
-        #draw all light collision lines
-        for o in objs:
-            if o.name == 'line':
-                if o.id == 2:
-                    pygame.draw.line(gameDisplay,blue,(o.x1,o.y1),(o.x2,o.y2),2)
-                if o.id == 3:
-                    pygame.draw.line(gameDisplay,black,(o.x1,o.y1),(o.x2,o.y2),2)
-                if o.id == 4:
-                    pygame.draw.line(gameDisplay,green,(o.x1,o.y1),(o.x2,o.y2),2)
+					for o in objs:
+						if o.name == 'wall':
+							l = str(o.id) + ' ' + str(o.x) + ' ' + str(o.y) + '\n'
+						elif o.name == 'line':
+							l = str(o.id) + ' ' + str(o.x1) + ' ' + str(o.y1) + ' ' + str(o.x2) + ' ' + str(o.y2) + '\n'
+						f.write(l)
 
-                # pygame.draw.line(gameDisplay,blue,(o.x1,o.y1),(o.x2,o.y2),2)
+					f.close()
+					quit = True
+
+					
+			if event.type == pygame.MOUSEBUTTONUP:
+				mousepress = True
+	
+
+		#erase whole display
+		gameDisplay.fill(white)
+		message('Selected : '+selected_object,black,1100,50,font2)
+		message('Line type : '+line_type,black,1100,70,font2)
+		message('Controls : ',black,1100,90,font2)
+		message('Move map : Arrow keys ',black,1100,110,font2)
+		message('Change map size : 1,2,3,4',black,1100,130,font2)
+		message('Add wall : w',black,1100,150,font2)
+		message('Add collision line : l',black,1100,170,font2)
+		message('Add visual line : v',black,1100,190,font2)
+		message('Add answer line a: ',black,1100,210,font2)
+		message('Add Player location: p',black,1100,230,font2)
+		message('Save: s',black,1100,250,font2)
+		message('Outline all borders using',black,1100,270,font2)
+		message('light line (l)',black,1100,290,font2)
+
+		#draw already drawn objects first
+		for o in objs:
+			if o.name == 'wall':
+				gameDisplay.blit(o.image,(o.x,o.y))
+		
+		#get mouse coords
+		mcoords = pygame.mouse.get_pos()
+		mx = mcoords[0]
+		my = mcoords[1]
+		mx , my = snap(mx,my)
+
+		
+		if (mx >= mapt['x'] and mx < (mapt['x'] + mapt['w'])) and \
+		   (my >= mapt['y'] and my < (mapt['y'] + mapt['h'])):
+		
+			if selected_object == 'wall':
+				wall1.x = mx
+				wall1.y = my
+
+				if mousepress == True:
+					#add wall to objects list
+					wl = wall(wall1.x,wall1.y)
+					objs.append(wl)
+				
+				#draw temp wall
+				gameDisplay.blit(wall1.image,(wall1.x,wall1.y))
+				
+
+			if selected_object == 'line':
+				if line_type == 'light':
+					line1.id = 2
+				if line_type == 'visual':
+					line1.id = 3
+				if line_type == 'answer':
+					line1.id = 4
+					
+				if linepoint1 == False:
+					line1.x1 = mx
+					line1.y1 = my   
+
+					if mousepress == True:
+						linepoint1 = True
+
+					#draw point 1 , first point of the line    
+					pygame.draw.circle(gameDisplay,green,(line1.x1,line1.y1),3,0)
+
+				else:
+					line1.x2 = mx
+					line1.y2 = my
+
+					#draw temp line with both points
+					pygame.draw.circle(gameDisplay,green,(line1.x1,line1.y1),3,0)
+					pygame.draw.circle(gameDisplay,green,(line1.x2,line1.y2),3,0)
+					pygame.draw.line(gameDisplay,red,(line1.x1,line1.y1),(line1.x2,line1.y2),3)   
+					
+					if mousepress == True:
+						linepoint1 = False
+						ln = line(line1.x1,line1.y1,line1.x2,line1.y2)
+						ln.id = line1.id
+						objs.append(ln)
+
+			if selected_object == 'player':
+				pygame.draw.circle(gameDisplay,green,mcoords,3,0)
+				if mousepress == True:
+					plyrx = mcoords[0] 
+					plyry = mcoords[1]
+
+		mousepress = False
+		
+		#draw display border
+		pygame.draw.line(gameDisplay,black,
+			(display['x'],display['y']),(display['x'] + display['w'],display['y']),1)
+		pygame.draw.line(gameDisplay,black,
+			(display['x'],display['y']),(display['x'],display['y']+ display['h']),1)
+		pygame.draw.line(gameDisplay,black,
+			(display['x'],display['y']+display['h']),(display['x']+ display['w'],display['y']+ display['h']),1)
+		pygame.draw.line(gameDisplay,black,
+			(display['x']+display['w'],display['y']),(display['x']+ display['w'],display['y']+ display['h']),1)
 
 
-        #draw map origin
-        pygame.draw.circle(gameDisplay,red,(mapt['x'],mapt['y']),6,0)
+		#draw grid
+		for x in range(0,display['w'],30):
+			pygame.draw.line(gameDisplay,grey,
+				(x+ display['x'], display['y']),(x+ display['x'],display['y']+ display['h']),1)
+		for y in range(0,display['h'],30):
+			pygame.draw.line(gameDisplay,grey,
+				( display['x'],y+ display['y']),(display['x']+ display['w'],y+ display['y']),1)        
 
-        #draw map borders
-        pygame.draw.line(gameDisplay,red,
-            (mapt['x'],mapt['y']),(mapt['x'] + mapt['w'],mapt['y']),2)
-        pygame.draw.line(gameDisplay,red,
-            (mapt['x'],mapt['y']),(mapt['x'],mapt['y']+ mapt['h']),2)
-        pygame.draw.line(gameDisplay,red,
-            (mapt['x'],mapt['y']+mapt['h']),(mapt['x']+ mapt['w'],mapt['y']+ mapt['h']),2)
-        pygame.draw.line(gameDisplay,red,
-            (mapt['x']+mapt['w'],mapt['y']),(mapt['x']+ mapt['w'],mapt['y']+ mapt['h']),2)
+		#draw all light collision lines
+		for o in objs:
+			if o.name == 'line':
+				if o.id == 2:
+					pygame.draw.line(gameDisplay,blue,(o.x1,o.y1),(o.x2,o.y2),2)
+				if o.id == 3:
+					pygame.draw.line(gameDisplay,black,(o.x1,o.y1),(o.x2,o.y2),2)
+				if o.id == 4:
+					pygame.draw.line(gameDisplay,green,(o.x1,o.y1),(o.x2,o.y2),2)
 
-
-
-        #draw player location
-        pygame.draw.circle(gameDisplay,red,(plyrx,plyry),3,0)
-
-        
-        pygame.display.update()
-        clock.tick(fps)
+				# pygame.draw.line(gameDisplay,blue,(o.x1,o.y1),(o.x2,o.y2),2)
 
 
+		#draw map origin
+		pygame.draw.circle(gameDisplay,red,(mapt['x'],mapt['y']),6,0)
 
-
+		#draw map borders
+		pygame.draw.line(gameDisplay,red,
+			(mapt['x'],mapt['y']),(mapt['x'] + mapt['w'],mapt['y']),2)
+		pygame.draw.line(gameDisplay,red,
+			(mapt['x'],mapt['y']),(mapt['x'],mapt['y']+ mapt['h']),2)
+		pygame.draw.line(gameDisplay,red,
+			(mapt['x'],mapt['y']+mapt['h']),(mapt['x']+ mapt['w'],mapt['y']+ mapt['h']),2)
+		pygame.draw.line(gameDisplay,red,
+			(mapt['x']+mapt['w'],mapt['y']),(mapt['x']+ mapt['w'],mapt['y']+ mapt['h']),2)
 
 
 
+		#draw player location
+		pygame.draw.circle(gameDisplay,red,(plyrx,plyry),3,0)
+
+		
+		pygame.display.update()
+		clock.tick(fps)
 
 
 
-        
+
+
+
+
+
+
+
+		
 # main code
-#pygame.display.toggle_fullscreen()
+pygame.display.toggle_fullscreen()
 gameintro()
 if mode == 'play':
-    gameinit()
-    gameloop()
+	gameinit()
+	gameloop()
 elif mode == 'edit':
-    editloop()
+	editloop()
 gameexit()
 
 
