@@ -11,11 +11,14 @@ blue = (0,0,255)
 red = (255,0,0)
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 clock = pygame.time.Clock()
-font = pygame.font.SysFont(None,50)
+
+font = pygame.font.SysFont("comicsansms",60)
+font1 = pygame.font.SysFont("arial",40)
+
 nm =""
-def message(msg,color,mesx,mesy):
+def message(msg,color,mesx,mesy,f):
     
-    screen = font.render(msg,True,color)
+    screen = f.render(msg,True,color)
     gameDisplay.blit(screen,[mesx,mesy])
 
 
@@ -50,14 +53,12 @@ def game2intro():
                     start = False
                  
          gameDisplay.fill(black)
-         if load ==1:
-              message("LOADING...",red,300,500)
-              pygame.display.update()
-         i=pygame.image.load('images/background.png')
-         i=pygame.transform.scale(i, (1000, 700))
-         gameDisplay.blit(i, (100,0))     
-         message('welcome to "SPAIN BULL RACE"',blue,300,300)
-         message('PRESS c TO continue THE GAME',black,400,400)
+        
+         i=pygame.image.load('images/bull_back.jpg')
+         i=pygame.transform.scale(i, (display_width, display_height))
+         gameDisplay.blit(i, (0,0))     
+         message('"SPAIN BULL RACE"',blue,300,300,font)
+         message('PRESS c to continue THE GAME',blue,400,400,font1)
             
            
          pygame.display.update()
@@ -128,8 +129,8 @@ def gameloop2():
                     map2.map2speedx = 0
                     gameDisplay.fill(black)
                     
-                    message("YOU WON",red,300,300)
-                    message("PRESS r TO REPLAY , q TO QUIT",white,400,400)
+                    message("YOU WON",red,300,300,font)
+                    message("q TO QUIT",white,400,400,font1)
                     
                     pygame.display.update()
                     clock.tick(60)
@@ -141,7 +142,7 @@ def gameloop2():
                                 map2.map2_x = 0
                                 map2.map2_y = 0
                                 a = False
-                                nm=""
+                                
                                 load_map2("map2")
                                 gameloop2()
                             else:
@@ -153,8 +154,8 @@ def gameloop2():
                     map2.map2speedx = 0
                     gameDisplay.fill(black)
                     
-                    message("DEAD",red,300,300)
-                    message("PRESS r TO REPLAY , q TO QUIT",white,400,400)
+                    message("DEAD",red,300,300,font)
+                    message("PRESS r TO REPLAY , q TO QUIT",white,400,400,font1)
                     
                     pygame.display.update()
                     clock.tick(60)
@@ -272,6 +273,7 @@ def load_map2(name):
 def map2_exit():
     pygame.quit()
     quit()
+#pygame.display.toggle_fullscreen()
 game2intro()
 load_map2("map2")
 gameloop2()  

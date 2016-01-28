@@ -15,18 +15,22 @@ objects = []
 lines = []
 mode = ''
 
-new_game = buttons(300,600,150,55)
-exit = buttons(600,600,150,55)
-pause_but = buttons(1300,0,150,55)
-cont = buttons(300,600,150,55)
-edit = buttons(450,700,290,55)
-ans = buttons(0,0,150,55)
+new_game = buttons(150,600,150,40)
+exit = buttons(400,600,150,40)
+ctrl = buttons(1100,600,200,40)
+edit = buttons(650,600,370,40)
+pause_but = buttons(1100,5,150,40)
+cont = buttons(600,600,150,40)
 
-lft = buttons(0,50,150,55)
-rgt = buttons(0,150,150,55)
-up = buttons(0,200,150,55)
-down =buttons(0,250,150,55)
-savechanges = buttons(0,300,150,55)
+ans = buttons(1100,50,150,40)
+
+
+lft = buttons(220,600,150,40)
+rgt = buttons(580,600,150,40)
+up = buttons(400,530,150,40)
+down =buttons(400,600,150,40)
+#ps = buttons(0,550,220,40)
+savechanges = buttons(360,680,220,40)
 
 #color variables
 black = (0,0,0)
@@ -47,9 +51,12 @@ c = True
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 #pygame.display.toggle_fullscreen()
 clock = pygame.time.Clock()
-font = pygame.font.SysFont(None,40)
-font1 = pygame.font.SysFont(None,80)
+
+font = pygame.font.SysFont("arial",35)
+font1 = pygame.font.SysFont("comicsansms",100)
 font2 = pygame.font.SysFont(None,20)
+font3 = pygame.font.SysFont("comicsansms",60)
+
 pause = True
 def menu():
 	pass
@@ -60,18 +67,11 @@ def message(msg,color,mesx,mesy,f):
 	gameDisplay.blit(screen,[mesx,mesy])
 
 
+
 def answer():
 	for line in lines:
 		if line.type == 'answer':
 			line.hidden = False
-	# fil = open("maps/level1.txt",'r')
-	# line = fil.readline()
-	# #while line:
-	# #    if line[0] == '4':
-	# #        print line
-	# #    line = fil.readline()
-	# for lin in fil:
-	#     print lin 
 
 def button(obj,msg,main_color,change_color,txt_col,action=None):
 	a=''
@@ -94,10 +94,11 @@ def button(obj,msg,main_color,change_color,txt_col,action=None):
 			elif action == "edit":
 				editloop()
 			elif action == "exit":
-				gameexit()
+				gameintro()
 			elif action == "lef":
 				chn_cont(action)
-
+			elif action == "ctrl":
+				control()
 			elif action == "svchn":
 				chn_cont(action)
 			elif action == "rgt":
@@ -106,14 +107,14 @@ def button(obj,msg,main_color,change_color,txt_col,action=None):
 				chn_cont(action)
 			elif action == "up":
 				chn_cont(action)
-			elif action == "answer":
-				answer()
+		 
 			
 	else:
 		pygame.draw.rect(gameDisplay,main_color,(obj.x,obj.y,obj.w,obj.h))
 	#message("changed to:",black,300,300,font)
 	message(a,black,300,300,font)
 	message(msg,txt_col,obj.x,obj.y,font)
+
 def unpause():
 	global pause
 	pause=False
@@ -122,7 +123,7 @@ def chn_cont(action):
 	global c 
 	global save
 	while save:
-		outfile = open('control.txt','w+')
+		
 		if action != "svchn":
 			# print "enter"
 			for event in pygame.event.get():
@@ -131,19 +132,15 @@ def chn_cont(action):
 					pygame.quit()
 					quit()
 				if event.type == pygame.KEYDOWN:
-					print "sd"
+					
 					print pygame.key.name(event.key)
 					dic[action] = event.key
 					print dic[action]
-					#c= False
-					outfile.write(str(action)+' '+str(event.key))
-					outfile.write("uhuhkujhkjh")
-					outfile.close()
+					
 					return
 					
-					#message("changed to:",black,300,300,font)
-					#pygame.display.update()
-					#clock.tick(60)
+					
+				
 		else:
 			
 			c = False
@@ -154,12 +151,18 @@ def chn_cont(action):
 def control():
 	
 	while c:
-
 		gameDisplay.fill(white)
+
+		message("Default Controls",black,300,20,font3)
+		message("Move Player : Arrow Keys",black,300,140,font)
+		message("Custom Controls",black,300,300,font3)
+		message("Click on the button you want to change control of, then click your desired key.",black,100,400,font)
+
 		button(lft,"LEFT",blue,hover_blue,black,'lef')
 		button(rgt,"RIGHT",blue,hover_blue,black,'rgt')
 		button(up,"UP",blue,hover_blue,black,'up')
 		button(down,"DOWN",blue,hover_blue,black,'dwn')
+
 		button(savechanges,"save changes",blue,hover_blue,black,'svchn')
 		for event in pygame.event.get():
 		#print(event)
@@ -169,6 +172,7 @@ def control():
 		
 			   
 							
+
 
 		pygame.display.update()
 		clock.tick(60)
@@ -180,6 +184,7 @@ def paused():
 	
 	while pause:
 
+
 		gameDisplay.fill(black)
 		for event in pygame.event.get():
 			#print(event)
@@ -187,21 +192,23 @@ def paused():
 				pygame.quit()
 				quit()
 				
-		message('PAUSED',blue,750,300,font1)
+		message('PAUSED',blue,500,300,font1)
 	 
-		button(cont,"continue",blue,hover_blue,black,'cont')
-		button(exit,"exit",red,hover_red,black,'exit')
+		button(cont,"Continue",blue,hover_blue,black,'cont')
+		button(exit,"Exit",red,hover_red,black,'exit')
 
 		pygame.display.update()
 		clock.tick(60)
 
 
 def gameintro():
+
 	start = True
 	load=0
 	global mode
 	global save
 	global c
+
 	while start:
 		 for event in pygame.event.get():
 			 if event.type == pygame.QUIT:
@@ -224,45 +231,31 @@ def gameintro():
 								  
 				 
 		 gameDisplay.fill(black)
-		 if load ==1:
-			  message('LOADING...',red,500,700)
-			  pygame.display.update()
-		 message('WELCOME TO THE BEST GAME EVER',blue,300,300,font1)
-		 message('PRESS s TO START THE GAME',white,400,500,font1)
+		 i=pygame.image.load('images/pattern.png')
+		 i=pygame.transform.scale(i, (display_width, display_height))
+		 gameDisplay.blit(i, (0,0))     
+		 message("MAZE TO RACE",blue,300,300,font1)
+		 #message('PRESS s TO START THE GAME',white,400,500,font1)
 
 		 button(new_game,"START",blue,hover_blue,black,'startgame')
 		 button(exit,"EXIT",red,hover_red,black,'exit')
-		 button(edit,"Make custom levels",green,hover_green,black,'edit')
+		 button(edit,"MAKE CUSTOM LEVEL",green,hover_green,black,'edit')
+		 button(ctrl,"CONTROLS",blue,hover_blue,black,'ctrl')
 
+		
 		 pygame.display.update()
 		 clock.tick(60)
 
 def gameinit():
 	load_map('level1')           
-class tim_disp(threading.Thread):
-	def run(self):
-		for i in range(0,10):
-			# print i
-			message(str(i),black,500,500,font)
-			
-			time.sleep(1)
-			pygame.display.update()
-			clock.tick(60)
+
 def gameloop():
    
 	quit = False
 	global pause
 	
 	#message("sfsd",black,200,200,font)
-	a = tim_disp()
-	a.start()
-
-
-	#
-	 
-
-	#Thread(target = disp, args = (1, )).start()
-	#Process(target=disp,args=(1,)).start()
+   
 	
 	while quit == False:
 
@@ -309,7 +302,7 @@ def gameloop():
 		if pressed_keys[pygame.K_p] == True:
 			pause = True
 			paused()
-   
+
 		   
 			
 		mcoords = point(pygame.mouse.get_pos()[0] ,pygame.mouse.get_pos()[1] )      
@@ -512,6 +505,7 @@ def gameloop():
 		tempcol = red
    
 
+
 		final_point = point(0,0)
 		intersection_point = point(0,0)
 		shortest_len = 100000000000
@@ -602,7 +596,6 @@ def gameloop():
 			#pygame.draw.line(gameDisplay,blue,(line2.x1,line2.y1),(line2.x2,line2.y2),2)
 			#pygame.draw.circle(gameDisplay,red,(int(final_point.x),int(final_point.y)),3,0)
 		pygame.draw.line(gameDisplay,line1.color,(line1.x1,line1.y1),(final_point.x,final_point.y),2)
-		# pygame.draw.line(gameDisplay,line1.color,(line1.x1,line1.y1),(tempx,tempy),2)
 
 		#update location of lines back to orignal
 		for l in lines:
@@ -617,8 +610,8 @@ def gameloop():
 
 		
 		#map draw-----------------------------------------------------------------------------------------------------
-		button(pause_but,"pause",blue,hover_blue,black,'paused')
-		button(ans,"answer",blue,hover_blue,black,'answer')
+		button(pause_but,"Pause",blue,hover_blue,black,'paused')
+		button(ans,"Answer",blue,hover_blue,black,'answer')
 		pygame.display.update()
 		clock.tick(fps)
 
@@ -1127,7 +1120,7 @@ def editloop():
 
 		
 # main code
-pygame.display.toggle_fullscreen()
+#pygame.display.toggle_fullscreen()
 gameintro()
 if mode == 'play':
 	gameinit()
