@@ -25,12 +25,12 @@ cont = buttons(600,600,150,40)
 ans = buttons(1100,50,150,40)
 
 
-lft = buttons(200,600,150,40)
-rgt = buttons(600,600,150,40)
-up = buttons(400,500,150,40)
+lft = buttons(220,600,150,40)
+rgt = buttons(580,600,150,40)
+up = buttons(400,530,150,40)
 down =buttons(400,600,150,40)
 #ps = buttons(0,550,220,40)
-savechanges = buttons(350,680,220,40)
+savechanges = buttons(360,680,220,40)
 
 #color variables
 black = (0,0,0)
@@ -55,6 +55,7 @@ clock = pygame.time.Clock()
 font = pygame.font.SysFont("arial",35)
 font1 = pygame.font.SysFont("comicsansms",100)
 font2 = pygame.font.SysFont(None,20)
+font3 = pygame.font.SysFont("comicsansms",60)
 
 pause = True
 def menu():
@@ -68,51 +69,51 @@ def message(msg,color,mesx,mesy,f):
 
 
 def answer():
-    for line in lines:
-        if line.type == 'answer':
-            line.hidden = False
+	for line in lines:
+		if line.type == 'answer':
+			line.hidden = False
 
 def button(obj,msg,main_color,change_color,txt_col,action=None):
-    a=''
+	a=''
 
-    mouse = pygame.mouse.get_pos()
-    click= pygame.mouse.get_pressed()
+	mouse = pygame.mouse.get_pos()
+	click= pygame.mouse.get_pressed()
 
-    if ((obj.x+obj.w) >=mouse[0] >=obj.x ) and ((obj.y+obj.h) >= mouse[1] >=(obj.y)):
-        pygame.draw.rect(gameDisplay,change_color,(obj.x,obj.y,obj.w,obj.h))
-        if click[0]==1 and action!=None:
-            if action=="startgame":
-                gameinit()
-                gameloop()
-            elif action=='paused':
-                global pause
-                pause = True
-                paused()
-            elif action == 'cont':
-                unpause()
-            elif action == "edit":
-                editloop()
-            elif action == "exit":
-                gameexit()
-            elif action == "lef":
-                chn_cont(action)
-            elif action == "ctrl":
-                control()
-            elif action == "svchn":
-                chn_cont(action)
-            elif action == "rgt":
-                chn_cont(action)
-            elif action == "dwn":
-                chn_cont(action)
-            elif action == "up":
-                chn_cont(action)
-         
-            
-    else:
-        pygame.draw.rect(gameDisplay,main_color,(obj.x,obj.y,obj.w,obj.h))
-    #message("changed to:",black,300,300,font)
-    message(a,black,300,300,font)
-    message(msg,txt_col,obj.x,obj.y,font)
+	if ((obj.x+obj.w) >=mouse[0] >=obj.x ) and ((obj.y+obj.h) >= mouse[1] >=(obj.y)):
+		pygame.draw.rect(gameDisplay,change_color,(obj.x,obj.y,obj.w,obj.h))
+		if click[0]==1 and action!=None:
+			if action=="startgame":
+				gameinit()
+				gameloop()
+			elif action=='paused':
+				global pause
+				pause = True
+				paused()
+			elif action == 'cont':
+				unpause()
+			elif action == "edit":
+				editloop()
+			elif action == "exit":
+				gameintro()
+			elif action == "lef":
+				chn_cont(action)
+			elif action == "ctrl":
+				control()
+			elif action == "svchn":
+				chn_cont(action)
+			elif action == "rgt":
+				chn_cont(action)
+			elif action == "dwn":
+				chn_cont(action)
+			elif action == "up":
+				chn_cont(action)
+		 
+			
+	else:
+		pygame.draw.rect(gameDisplay,main_color,(obj.x,obj.y,obj.w,obj.h))
+	#message("changed to:",black,300,300,font)
+	message(a,black,300,300,font)
+	message(msg,txt_col,obj.x,obj.y,font)
 
 def unpause():
 	global pause
@@ -122,7 +123,7 @@ def chn_cont(action):
 	global c 
 	global save
 	while save:
-		outfile = open('control.txt','w+')
+		
 		if action != "svchn":
 			# print "enter"
 			for event in pygame.event.get():
@@ -131,19 +132,15 @@ def chn_cont(action):
 					pygame.quit()
 					quit()
 				if event.type == pygame.KEYDOWN:
-					print "sd"
+					
 					print pygame.key.name(event.key)
 					dic[action] = event.key
 					print dic[action]
-					#c= False
-					outfile.write(str(action)+' '+str(event.key))
-					outfile.write("uhuhkujhkjh")
-					outfile.close()
+					
 					return
 					
-					#message("changed to:",black,300,300,font)
-					#pygame.display.update()
-					#clock.tick(60)
+					
+				
 		else:
 			
 			c = False
@@ -154,24 +151,27 @@ def chn_cont(action):
 def control():
 	
 	while c:
+		gameDisplay.fill(white)
 
+		message("Default Controls",black,300,20,font3)
+		message("Move Player : Arrow Keys",black,300,140,font)
+		message("Custom Controls",black,300,300,font3)
+		message("Click on the button you want to change control of, then click your desired key.",black,100,400,font)
 
-        gameDisplay.fill(white)
+		button(lft,"LEFT",blue,hover_blue,black,'lef')
+		button(rgt,"RIGHT",blue,hover_blue,black,'rgt')
+		button(up,"UP",blue,hover_blue,black,'up')
+		button(down,"DOWN",blue,hover_blue,black,'dwn')
 
-        button(lft,"LEFT",blue,hover_blue,black,'lef')
-        button(rgt,"RIGHT",blue,hover_blue,black,'rgt')
-        button(up,"UP",blue,hover_blue,black,'up')
-        button(down,"DOWN",blue,hover_blue,black,'dwn')
-
-        button(savechanges,"save changes",blue,hover_blue,black,'svchn')
-        for event in pygame.event.get():
-        #print(event)
-         if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()
-        
-               
-                            
+		button(savechanges,"save changes",blue,hover_blue,black,'svchn')
+		for event in pygame.event.get():
+		#print(event)
+		 if event.type == pygame.QUIT:
+			pygame.quit()
+			quit()
+		
+			   
+							
 
 
 		pygame.display.update()
@@ -185,17 +185,17 @@ def paused():
 	while pause:
 
 
-        gameDisplay.fill(black)
-        for event in pygame.event.get():
-            #print(event)
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-                
-        message('PAUSED',blue,500,300,font1)
-     
-        button(cont,"continue",blue,hover_blue,black,'cont')
-        button(exit,"exit",red,hover_red,black,'exit')
+		gameDisplay.fill(black)
+		for event in pygame.event.get():
+			#print(event)
+			if event.type == pygame.QUIT:
+				pygame.quit()
+				quit()
+				
+		message('PAUSED',blue,500,300,font1)
+	 
+		button(cont,"Continue",blue,hover_blue,black,'cont')
+		button(exit,"Exit",red,hover_red,black,'exit')
 
 		pygame.display.update()
 		clock.tick(60)
@@ -203,105 +203,105 @@ def paused():
 
 def gameintro():
 
-    start = True
-    load=0
-    global mode
-    global save
-    global c
+	start = True
+	load=0
+	global mode
+	global save
+	global c
 
-    while start:
-         for event in pygame.event.get():
-             if event.type == pygame.QUIT:
-                 gameexit()
-             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_s:
-                    load = 1
-                    start = False
-                    mode = 'play'
-                elif event.key == pygame.K_c:
-                    print event.key
-                    c = True
-                    save =True
-                    dic={}
-                    control()
-                elif event.key == pygame.K_e:
-                    load = 1
-                    start = False
-                    mode = 'edit'
-                                  
-                 
-         gameDisplay.fill(black)
-         i=pygame.image.load('images/pattern.png')
-         i=pygame.transform.scale(i, (display_width, display_height))
-         gameDisplay.blit(i, (0,0))     
-         message("MAZE TO RACE",blue,300,300,font1)
-         #message('PRESS s TO START THE GAME',white,400,500,font1)
+	while start:
+		 for event in pygame.event.get():
+			 if event.type == pygame.QUIT:
+				 gameexit()
+			 if event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_s:
+					load = 1
+					start = False
+					mode = 'play'
+				elif event.key == pygame.K_c:
+					print event.key
+					c = True
+					save =True
+					dic={}
+					control()
+				elif event.key == pygame.K_e:
+					load = 1
+					start = False
+					mode = 'edit'
+								  
+				 
+		 gameDisplay.fill(black)
+		 i=pygame.image.load('images/pattern.png')
+		 i=pygame.transform.scale(i, (display_width, display_height))
+		 gameDisplay.blit(i, (0,0))     
+		 message("MAZE TO RACE",blue,300,300,font1)
+		 #message('PRESS s TO START THE GAME',white,400,500,font1)
 
-         button(new_game,"START",blue,hover_blue,black,'startgame')
-         button(exit,"EXIT",red,hover_red,black,'exit')
-         button(edit,"MAKE CUSTOM LEVEL",green,hover_green,black,'edit')
-         button(ctrl,"CONTROLS",blue,hover_blue,black,'ctrl')
+		 button(new_game,"START",blue,hover_blue,black,'startgame')
+		 button(exit,"EXIT",red,hover_red,black,'exit')
+		 button(edit,"MAKE CUSTOM LEVEL",green,hover_green,black,'edit')
+		 button(ctrl,"CONTROLS",blue,hover_blue,black,'ctrl')
 
-        
-         pygame.display.update()
-         clock.tick(60)
+		
+		 pygame.display.update()
+		 clock.tick(60)
 
 def gameinit():
-    load_map('level1')           
+	load_map('level1')           
 
 def gameloop():
    
-    quit = False
-    global pause
-    
-    #message("sfsd",black,200,200,font)
+	quit = False
+	global pause
+	
+	#message("sfsd",black,200,200,font)
    
-    
-    while quit == False:
+	
+	while quit == False:
 
 
-        is_O_pressed = False
-   	    #events---------------------------------------------------------------------------------------------------
-        for event in pygame.event.get():
-        
-            # event - quit
-            if event.type == pygame.QUIT:
-                quit = True
-                gameexit()
-            if event.type == pygame.KEYDOWN:
+		is_O_pressed = False
+		#events---------------------------------------------------------------------------------------------------
+		for event in pygame.event.get():
+		
+			# event - quit
+			if event.type == pygame.QUIT:
+				quit = True
+				gameexit()
+			if event.type == pygame.KEYDOWN:
 
-                #close game if backspace is pressed
-                #(made this shortcut as game cannot be closed in full screen)
-                if event.key == pygame.K_BACKSPACE:
-                    quit = True
-                #toggles fulscreen mode when pressing esc
-                if event.key == pygame.K_ESCAPE:
-                    pygame.display.toggle_fullscreen()
-                if event.key == pygame.K_o:
-                    is_O_pressed = True
-               
-                    
-                    
+				#close game if backspace is pressed
+				#(made this shortcut as game cannot be closed in full screen)
+				if event.key == pygame.K_BACKSPACE:
+					quit = True
+				#toggles fulscreen mode when pressing esc
+				if event.key == pygame.K_ESCAPE:
+					pygame.display.toggle_fullscreen()
+				if event.key == pygame.K_o:
+					is_O_pressed = True
+			   
+					
+					
 
-            #used for debugging
-            #print event
-        global dic
-        #this event runs when any key is pressed
-        pressed_keys = pygame.key.get_pressed()
-        if pressed_keys[pygame.K_LEFT] == True or pressed_keys[dic["lef"]]==True:
-            
-            player1.move('left')
+			#used for debugging
+			#print event
+		global dic
+		#this event runs when any key is pressed
+		pressed_keys = pygame.key.get_pressed()
+		if pressed_keys[pygame.K_LEFT] == True or pressed_keys[dic["lef"]]==True:
+			
+			player1.move('left')
 
-        if pressed_keys[pygame.K_RIGHT] == True or pressed_keys[dic["rgt"]]==True:
-            
-            player1.move('right')
-        if pressed_keys[pygame.K_UP] == True or pressed_keys[dic["up"]]==True:
-            player1.move('up')
-        if pressed_keys[pygame.K_DOWN] == True or pressed_keys[dic["dwn"]]==True:
-            player1.move('down')
-        if pressed_keys[pygame.K_p] == True:
-            pause = True
-            paused()
+		if pressed_keys[pygame.K_RIGHT] == True or pressed_keys[dic["rgt"]]==True:
+			
+			player1.move('right')
+		if pressed_keys[pygame.K_UP] == True or pressed_keys[dic["up"]]==True:
+			player1.move('up')
+		if pressed_keys[pygame.K_DOWN] == True or pressed_keys[dic["dwn"]]==True:
+			player1.move('down')
+		if pressed_keys[pygame.K_p] == True:
+			pause = True
+			paused()
 
 		   
 			
@@ -506,114 +506,114 @@ def gameloop():
    
 
 
-        final_point = point(0,0)
-        intersection_point = point(0,0)
-        shortest_len = 100000000000
-        
-        line1 = line(player1.x + (player1.w/2),player1.y + (player1.h/2) , tempx,tempy)
-        line1.length = ((line1.x2-line1.x1)**2 + (line1.y2-line1.y1)**2)**0.5
-        line1.color = tempcol
+		final_point = point(0,0)
+		intersection_point = point(0,0)
+		shortest_len = 100000000000
+		
+		line1 = line(player1.x + (player1.w/2),player1.y + (player1.h/2) , tempx,tempy)
+		line1.length = ((line1.x2-line1.x1)**2 + (line1.y2-line1.y1)**2)**0.5
+		line1.color = tempcol
 
-        if line1.x2 != line1.x1:
-            line1.slope = (line1.y2 - line1.y1) / (line1.x2 - line1.x1)
-        else:
-            #slope is infinity
-            line1.is_vertical = True
-            
+		if line1.x2 != line1.x1:
+			line1.slope = (line1.y2 - line1.y1) / (line1.x2 - line1.x1)
+		else:
+			#slope is infinity
+			line1.is_vertical = True
+			
 
 
-        #for i in range(0,20):
-        for line2 in lines:
-            #line2 = lines[14]
-            
-            if line1.is_vertical == True and line2.is_vertical == True:
-                #either they are the same lines or they are parallel
-                continue
-                
+		#for i in range(0,20):
+		for line2 in lines:
+			#line2 = lines[14]
+			
+			if line1.is_vertical == True and line2.is_vertical == True:
+				#either they are the same lines or they are parallel
+				continue
+				
 
-            elif line1.is_vertical == True and line2.is_vertical == False:
-                #     (y-y1) = m2(x-x1) is the equation for line 2
-                #      and x = x1 = x2 is the equation for line 1 
-                #   =>    y  = m2x - m2x1 + y1
-                #   where x is from line 1
+			elif line1.is_vertical == True and line2.is_vertical == False:
+				#     (y-y1) = m2(x-x1) is the equation for line 2
+				#      and x = x1 = x2 is the equation for line 1 
+				#   =>    y  = m2x - m2x1 + y1
+				#   where x is from line 1
 
-                intersection_point.x = line1.x1
-                intersection_point.y = (line2.slope*line1.x1) - (line2.slope*line2.x1) + line2.y1
-                if intersection_point.y < line1.y1 or intersection_point.y > line1.y2:
-                    continue
-            
-            elif line1.is_vertical == False and line2.is_vertical == True:
-                # opposite of above case
-            
-                intersection_point.x = line2.x1
-                intersection_point.y = (line1.slope*line2.x1) - (line1.slope*line1.x1) + line1.y1
-                if intersection_point.y < line2.y1 or intersection_point.y > line2.y2:
-                    continue
+				intersection_point.x = line1.x1
+				intersection_point.y = (line2.slope*line1.x1) - (line2.slope*line2.x1) + line2.y1
+				if intersection_point.y < line1.y1 or intersection_point.y > line1.y2:
+					continue
+			
+			elif line1.is_vertical == False and line2.is_vertical == True:
+				# opposite of above case
+			
+				intersection_point.x = line2.x1
+				intersection_point.y = (line1.slope*line2.x1) - (line1.slope*line1.x1) + line1.y1
+				if intersection_point.y < line2.y1 or intersection_point.y > line2.y2:
+					continue
 
-            else:
-                
-                if line1.slope - line2.slope == 0:
-                    #either they are the same line or parallel
-                    continue
-                    
-            
-                #both lines have finite slopes
-                # for line 1 -> l1y=m1(x-l1x1) + l1y1
-                # for line 2 -> l2y=m2(x-l2x1) + l2y1
-                # for intersection y of both lines is same 
-                #     => l1y = l2y
-                #   => m1x - m1.l1x1 + l1y1 = m2x - m2.l2x1 + l2y1
-                #   => (m1-m2)x = m1.l1x1 - m2.l2x1 - l1y1 + l2y1
-                #   =>        x = (m1.lix1 - m2.l2x1 - liy1 + l2y1) / (m1-m2)
-                #putting this value of x in equation for l1y we get y
+			else:
+				
+				if line1.slope - line2.slope == 0:
+					#either they are the same line or parallel
+					continue
+					
+			
+				#both lines have finite slopes
+				# for line 1 -> l1y=m1(x-l1x1) + l1y1
+				# for line 2 -> l2y=m2(x-l2x1) + l2y1
+				# for intersection y of both lines is same 
+				#     => l1y = l2y
+				#   => m1x - m1.l1x1 + l1y1 = m2x - m2.l2x1 + l2y1
+				#   => (m1-m2)x = m1.l1x1 - m2.l2x1 - l1y1 + l2y1
+				#   =>        x = (m1.lix1 - m2.l2x1 - liy1 + l2y1) / (m1-m2)
+				#putting this value of x in equation for l1y we get y
 
-                intersection_point.x = ((line1.slope*line1.x1) - (line2.slope*line2.x1) - line1.y1 + line2.y1) / (line1.slope - line2.slope)
-                intersection_point.y = (line1.slope*intersection_point.x) - (line1.slope*line1.x1) + line1.y1
-                #pygame.draw.circle(gameDisplay,black,(int(intersection_point.x),int(intersection_point.y)),3,0)
+				intersection_point.x = ((line1.slope*line1.x1) - (line2.slope*line2.x1) - line1.y1 + line2.y1) / (line1.slope - line2.slope)
+				intersection_point.y = (line1.slope*intersection_point.x) - (line1.slope*line1.x1) + line1.y1
+				#pygame.draw.circle(gameDisplay,black,(int(intersection_point.x),int(intersection_point.y)),3,0)
 
-            p1 = point(line1.x1,line1.y1)
-            p2 = point(line1.x2,line1.y2)
-            p3 = point(line2.x1,line2.y1)
-            p4 = point(line2.x2,line2.y2)
-            p = point(intersection_point.x,intersection_point.y)
-            #now we have to check if intersection point lies on both line segments or not
-            #as the intersection can be found by extending the lines also
+			p1 = point(line1.x1,line1.y1)
+			p2 = point(line1.x2,line1.y2)
+			p3 = point(line2.x1,line2.y1)
+			p4 = point(line2.x2,line2.y2)
+			p = point(intersection_point.x,intersection_point.y)
+			#now we have to check if intersection point lies on both line segments or not
+			#as the intersection can be found by extending the lines also
 
-            
-            if isBetween(p1,p2,p) == True and isBetween(p3,p4,p) == True:
-                
-                temp_length = ((intersection_point.x-line1.x1)**2 + (intersection_point.y-line1.y1)**2)**0.5
-                if temp_length < shortest_len:
-                    shortest_len = temp_length
-                    final_point.x = intersection_point.x
-                    final_point.y = intersection_point.y
-            
-            
-            if line1.length < shortest_len:
-                final_point.x = line1.x2
-                final_point.y = line1.y2
+			
+			if isBetween(p1,p2,p) == True and isBetween(p3,p4,p) == True:
+				
+				temp_length = ((intersection_point.x-line1.x1)**2 + (intersection_point.y-line1.y1)**2)**0.5
+				if temp_length < shortest_len:
+					shortest_len = temp_length
+					final_point.x = intersection_point.x
+					final_point.y = intersection_point.y
+			
+			
+			if line1.length < shortest_len:
+				final_point.x = line1.x2
+				final_point.y = line1.y2
 
-            #pygame.draw.line(gameDisplay,blue,(line2.x1,line2.y1),(line2.x2,line2.y2),2)
-            #pygame.draw.circle(gameDisplay,red,(int(final_point.x),int(final_point.y)),3,0)
-        pygame.draw.line(gameDisplay,line1.color,(line1.x1,line1.y1),(final_point.x,final_point.y),2)
+			#pygame.draw.line(gameDisplay,blue,(line2.x1,line2.y1),(line2.x2,line2.y2),2)
+			#pygame.draw.circle(gameDisplay,red,(int(final_point.x),int(final_point.y)),3,0)
+		pygame.draw.line(gameDisplay,line1.color,(line1.x1,line1.y1),(final_point.x,final_point.y),2)
 
-        #update location of lines back to orignal
-        for l in lines:
-            l.x1 -= map1.mapx
-            l.y1 -= map1.mapy
-            l.x2 -= map1.mapx
-            l.y2 -= map1.mapy
+		#update location of lines back to orignal
+		for l in lines:
+			l.x1 -= map1.mapx
+			l.y1 -= map1.mapy
+			l.x2 -= map1.mapx
+			l.y2 -= map1.mapy
 
-        #ipdate location of mouse to normal
-        #mcoords.x -= map1.mapx
-        #mcoords.y -= map1.mapy
+		#ipdate location of mouse to normal
+		#mcoords.x -= map1.mapx
+		#mcoords.y -= map1.mapy
 
-        
-	    #map draw-----------------------------------------------------------------------------------------------------
-        button(pause_but,"Pause",blue,hover_blue,black,'paused')
-        button(ans,"Answer",blue,hover_blue,black,'answer')
-        pygame.display.update()
-        clock.tick(fps)
+		
+		#map draw-----------------------------------------------------------------------------------------------------
+		button(pause_but,"Pause",blue,hover_blue,black,'paused')
+		button(ans,"Answer",blue,hover_blue,black,'answer')
+		pygame.display.update()
+		clock.tick(fps)
 
 
 
@@ -1120,7 +1120,7 @@ def editloop():
 
 		
 # main code
-pygame.display.toggle_fullscreen()
+#pygame.display.toggle_fullscreen()
 gameintro()
 if mode == 'play':
 	gameinit()
