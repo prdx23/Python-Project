@@ -119,41 +119,60 @@ def gameloop2():
         else:
             #if obj.name=="bull":
             #    print 'bull'
-
-            if nm == "car":
-                gameDisplay.fill(black)
-                
-                message("won",red,300,300)
-                message("PRESS r TO REPLAY , q TO QUIT",white,400,400)
-                
-                pygame.display.update()
-                clock.tick(60)
-                
             a = True
-            while a == True:
-                map2.map2speedx = 0
-                gameDisplay.fill(black)
+            
                 
-                message("DEAD",red,300,300)
-                message("PRESS r TO REPLAY , q TO QUIT",white,400,400)
-                
-                pygame.display.update()
-                clock.tick(60)
-                
-                
-                for event in pygame.event.get():
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_r:
-                            map2.map2_x = 0
-                            map2.map2_y = 0
-                            a = False
-                            load_map2("map2")
-                            gameloop2()
-                        else:
-                            if event.key == pygame.K_q:
+            
+            while a:
+                if nm == "car":
+                    map2.map2speedx = 0
+                    gameDisplay.fill(black)
+                    
+                    message("YOU WON",red,300,300)
+                    message("PRESS r TO REPLAY , q TO QUIT",white,400,400)
+                    
+                    pygame.display.update()
+                    clock.tick(60)
+                    
+                    
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_r:
+                                map2.map2_x = 0
+                                map2.map2_y = 0
                                 a = False
-                                map2_exit()
-                
+                                nm=""
+                                load_map2("map2")
+                                gameloop2()
+                            else:
+                                if event.key == pygame.K_q:
+                                    a = False
+                                    map2_exit()
+
+                else:
+                    map2.map2speedx = 0
+                    gameDisplay.fill(black)
+                    
+                    message("DEAD",red,300,300)
+                    message("PRESS r TO REPLAY , q TO QUIT",white,400,400)
+                    
+                    pygame.display.update()
+                    clock.tick(60)
+                    
+                    
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_r:
+                                map2.map2_x = 0
+                                map2.map2_y = 0
+                                a = False
+                                load_map2("map2")
+                                gameloop2()
+                            else:
+                                if event.key == pygame.K_q:
+                                    a = False
+                                    map2_exit()
+                    
                     
         player2.inertia()
         inertiamap2()
