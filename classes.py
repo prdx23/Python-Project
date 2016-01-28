@@ -69,6 +69,8 @@ class line():
 
         self.name = 'line'
         self.id = 2
+        self.type = 'none'
+        self.hidden = False
 
         self.x1 = x1
         self.x2 = x2

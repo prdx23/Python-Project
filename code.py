@@ -60,14 +60,17 @@ def message(msg,color,mesx,mesy,f):
 
 
 def answer():
-    fil = open("maps/level1.txt",'r')
-    line = fil.readline()
-    #while line:
-    #    if line[0] == '4':
-    #        print line
-    #    line = fil.readline()
-    for lin in fil:
-        print lin 
+    for line in lines:
+        if line.type == 'answer':
+            line.hidden = False
+    # fil = open("maps/level1.txt",'r')
+    # line = fil.readline()
+    # #while line:
+    # #    if line[0] == '4':
+    # #        print line
+    # #    line = fil.readline()
+    # for lin in fil:
+    #     print lin 
 
 def button(obj,msg,main_color,change_color,txt_col,action=None):
     a=''
@@ -671,12 +674,14 @@ def load_map(name):
             objects.append(wl)
 
         if int(a[0]) == 2:
-            #id of line
+            #id of light line
             lx1 = float(a[1])
             ly1 = float(a[2])
             lx2 = float(a[3])
             ly2 = float(a[4])
             ln = line(lx1,ly1,lx2,ly2)
+            ln.type = 'light'
+            ln.hidden = True
 
             if lx2 != lx1:
                 lm = (ly2-ly1)/(lx2-lx1)
@@ -688,15 +693,55 @@ def load_map(name):
             lines.append(ln)
 
         if int(a[0]) == 3:
-            #id of door
-            dx = float(a[1])
-            dy = float(a[2])
-            dr = door(wx,wy)
-            objects.append(dr)
+            #id of visual line
+            lx1 = float(a[1])
+            ly1 = float(a[2])
+            lx2 = float(a[3])
+            ly2 = float(a[4])
+            ln = line(lx1,ly1,lx2,ly2)
+            ln.type = 'visual'
+            ln.color = black
+            ln.id = 3
+
+            if lx2 != lx1:
+                lm = (ly2-ly1)/(lx2-lx1)
+            else:
+                ln.is_vertical = True
+            
+            ln.slope = lm
+            ln.length = ((lx2-lx1)**2 + (ly2-ly1)**2 )**0.5
+            lines.append(ln)
+
+        if int(a[0]) == 4:
+            #id of answer line
+            lx1 = float(a[1])
+            ly1 = float(a[2])
+            lx2 = float(a[3])
+            ly2 = float(a[4])
+            ln = line(lx1,ly1,lx2,ly2)
+            ln.type = 'answer'
+            ln.hidden = True
+            ln.color = green
+            ln.id = 4
+            
+            if lx2 != lx1:
+                lm = (ly2-ly1)/(lx2-lx1)
+            else:
+                ln.is_vertical = True
+            
+            ln.slope = lm
+            ln.length = ((lx2-lx1)**2 + (ly2-ly1)**2 )**0.5
+            lines.append(ln)
+
   
 def draw_map(x,y):
     for obj in objects:
         draw(obj,x,y)
+
+    for line in lines:
+        if line.hidden == False:
+            pygame.draw.line(gameDisplay,line.color,(line.x1,line.y1),(line.x2,line.y2),2)
+
     draw(player1,0,0)
 
 
@@ -1061,7 +1106,7 @@ def editloop():
 
         
 # main code
-#pygame.display.toggle_fullscreen()
+pygame.display.toggle_fullscreen()
 gameintro()
 if mode == 'play':
     gameinit()
