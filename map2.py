@@ -12,7 +12,7 @@ red = (255,0,0)
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 clock = pygame.time.Clock()
 font = pygame.font.SysFont(None,50)
-
+nm =""
 def message(msg,color,mesx,mesy):
     
     screen = font.render(msg,True,color)
@@ -63,6 +63,7 @@ def game2intro():
          pygame.display.update()
          clock.tick(60)
 def gameloop2():
+    global nm
     gameexit = False
     while gameexit == False:
         for event in pygame.event.get():
@@ -84,6 +85,8 @@ def gameloop2():
         for obj in objects:
            
             if collide(player2,obj,map2.map2_x,map2.map2_y) == True:
+                if obj.name == "car":
+                    nm = "car"
                 is_collided = True
     
 
@@ -92,7 +95,7 @@ def gameloop2():
             if -1*(map2.map2_x) + display_width <= map2.map2_edgex:
                 map2.map2speedx = -map2.maxspeed
                 #print(map2.maxwid)
-                print(map2.map2_x)
+                #print(map2.map2_x)
                 if (map2.map2_x <= -2300 and map2.map2_x >= -2400) or (map2.mapp == True):
                     map2.map2speedx = 0
                     map2.maxspeed = 0
@@ -114,8 +117,11 @@ def gameloop2():
             
             
         else:
-            if obj.name=="bull":
-                print('bull')
+            #if obj.name=="bull":
+            #    print 'bull'
+
+            if nm == "car":
+                print "car"
             a = True
             while a == True:
                 map2.map2speedx = 0
