@@ -1106,7 +1106,7 @@ def editloop():
 
         
 # main code
-pygame.display.toggle_fullscreen()
+#pygame.display.toggle_fullscreen()
 gameintro()
 if mode == 'play':
     gameinit()
