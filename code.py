@@ -299,7 +299,7 @@ def gameloop():
             player1.move('left')
 
         if pressed_keys[pygame.K_RIGHT] == True or pressed_keys[dic["rgt"]]==True:
-            print pygame.K_RIGHT
+            
             player1.move('right')
         if pressed_keys[pygame.K_UP] == True or pressed_keys[dic["up"]]==True:
             player1.move('up')
@@ -331,8 +331,9 @@ def gameloop():
         
         if is_collided == False:
             #player is not touching anything
-
-            if player1.x>600:
+            print player1.x
+            if player1.x >= map1.map_edge_x:
+                
                 import map2
 
 
@@ -657,8 +658,9 @@ def load_map(name):
     f = open(path,'r')
 
     for l in f:
-        a = l.split()
 
+        a = l.split()
+        print a[0]
         if int(a[0]) == 0:
             #id of first line
             player1.x = float(a[1])
@@ -855,7 +857,7 @@ def reset_map(mapt,objs,display,typ):
             
 
 def editloop():
-
+    global selected_object
     objs = []
     wall1 = wall(0,0)
     line1 = line(0,0,0,0)
@@ -1106,7 +1108,7 @@ def editloop():
 
         
 # main code
-pygame.display.toggle_fullscreen()
+#pygame.display.toggle_fullscreen()
 gameintro()
 if mode == 'play':
     gameinit()
