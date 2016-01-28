@@ -121,7 +121,14 @@ def gameloop2():
             #    print 'bull'
 
             if nm == "car":
-                print "car"
+                gameDisplay.fill(black)
+                
+                message("won",red,300,300)
+                message("PRESS r TO REPLAY , q TO QUIT",white,400,400)
+                
+                pygame.display.update()
+                clock.tick(60)
+                
             a = True
             while a == True:
                 map2.map2speedx = 0
