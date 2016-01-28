@@ -1,7 +1,8 @@
 import pygame
 import sys
 from classes import *
-
+import threading
+import time
 pygame.init()
 
 #global variables
@@ -19,7 +20,13 @@ exit = buttons(600,600,150,55)
 pause_but = buttons(1300,0,150,55)
 cont = buttons(300,600,150,55)
 edit = buttons(450,700,290,55)
+ans = buttons(0,0,150,55)
 
+lft = buttons(0,50,150,55)
+rgt = buttons(0,150,150,55)
+up = buttons(0,200,150,55)
+down =buttons(0,250,150,55)
+savechanges = buttons(0,300,150,55)
 
 #color variables
 black = (0,0,0)
@@ -32,6 +39,9 @@ hover_green = (0,100,0)
 hover_blue = (0,0,100)
 hover_red = (100,0,0)
 
+dic={'lef':102,'rgt':0,'dwn':0,'up':0}
+save = True
+c = True
 
 # main pygame variables
 gameDisplay = pygame.display.set_mode((display_width,display_height))
@@ -48,12 +58,23 @@ def message(msg,color,mesx,mesy,f):
     screen = f.render(msg,True,color)
     gameDisplay.blit(screen,[mesx,mesy])
 
-def button(obj,msg,main_color,change_color,txt_col,action=None):
 
+def answer():
+    fil = open("maps/level1.txt",'r')
+    line = fil.readline()
+    #while line:
+    #    if line[0] == '4':
+    #        print line
+    #    line = fil.readline()
+    for lin in fil:
+        print lin 
+
+def button(obj,msg,main_color,change_color,txt_col,action=None):
+    a=''
 
     mouse = pygame.mouse.get_pos()
     click= pygame.mouse.get_pressed()
-    
+
     if ((obj.x+obj.w) >=mouse[0] >=obj.x ) and ((obj.y+obj.h) >= mouse[1] >=(obj.y)):
         pygame.draw.rect(gameDisplay,change_color,(obj.x,obj.y,obj.w,obj.h))
         if click[0]==1 and action!=None:
@@ -70,12 +91,86 @@ def button(obj,msg,main_color,change_color,txt_col,action=None):
                 editloop()
             elif action == "exit":
                 gameexit()
+            elif action == "lef":
+                chn_cont(action)
+
+            elif action == "svchn":
+                chn_cont(action)
+            elif action == "rgt":
+                chn_cont(action)
+            elif action == "dwn":
+                chn_cont(action)
+            elif action == "up":
+                chn_cont(action)
+            elif action == "answer":
+                answer()
+            
     else:
         pygame.draw.rect(gameDisplay,main_color,(obj.x,obj.y,obj.w,obj.h))
+    #message("changed to:",black,300,300,font)
+    message(a,black,300,300,font)
     message(msg,txt_col,obj.x,obj.y,font)
 def unpause():
     global pause
     pause=False
+
+def chn_cont(action):
+    global c 
+    global save
+    while save:
+        outfile = open('control.txt','w+')
+        if action != "svchn":
+            print "enter"
+            for event in pygame.event.get():
+                #print(event)
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+                if event.type == pygame.KEYDOWN:
+                    print "sd"
+                    print pygame.key.name(event.key)
+                    dic[action] = event.key
+                    print dic[action]
+                    #c= False
+                    outfile.write(str(action)+' '+str(event.key))
+                    outfile.write("uhuhkujhkjh")
+                    outfile.close()
+                    return
+                    
+                    #message("changed to:",black,300,300,font)
+                    #pygame.display.update()
+                    #clock.tick(60)
+        else:
+            
+            c = False
+            save = False
+               
+           
+    
+def control():
+    
+    while c:
+
+        gameDisplay.fill(white)
+        button(lft,"LEFT",blue,hover_blue,black,'lef')
+        button(rgt,"RIGHT",blue,hover_blue,black,'rgt')
+        button(up,"UP",blue,hover_blue,black,'up')
+        button(down,"DOWN",blue,hover_blue,black,'dwn')
+        button(savechanges,"save changes",blue,hover_blue,black,'svchn')
+        for event in pygame.event.get():
+        #print(event)
+         if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+        
+               
+                            
+
+        pygame.display.update()
+        clock.tick(60)
+
+
+
 
 def paused():
     
@@ -101,6 +196,8 @@ def gameintro():
     start = True
     load=0
     global mode
+    global save
+    global c
     while start:
          for event in pygame.event.get():
              if event.type == pygame.QUIT:
@@ -110,6 +207,12 @@ def gameintro():
                     load = 1
                     start = False
                     mode = 'play'
+                elif event.key == pygame.K_c:
+                    print event.key
+                    c = True
+                    save =True
+                    dic={}
+                    control()
                 elif event.key == pygame.K_e:
                     load = 1
                     start = False
@@ -132,11 +235,30 @@ def gameintro():
 
 def gameinit():
     load_map('level1')           
-
+class tim_disp(threading.Thread):
+    def run(self):
+        for i in range(0,10):
+            print i
+            message(str(i),black,500,500,font)
+            
+            time.sleep(1)
+            pygame.display.update()
+            clock.tick(60)
 def gameloop():
    
     quit = False
     global pause
+    
+    #message("sfsd",black,200,200,font)
+    a = tim_disp()
+    a.start()
+
+
+    #
+     
+
+    #Thread(target = disp, args = (1, )).start()
+    #Process(target=disp,args=(1,)).start()
     
     while quit == False:
 
@@ -166,16 +288,19 @@ def gameloop():
 
             #used for debugging
             #print event
-
+        global dic
         #this event runs when any key is pressed
         pressed_keys = pygame.key.get_pressed()
-        if pressed_keys[pygame.K_LEFT] == True:
+        if pressed_keys[pygame.K_LEFT] == True or pressed_keys[dic["lef"]]==True:
+            
             player1.move('left')
-        if pressed_keys[pygame.K_RIGHT] == True:
+
+        if pressed_keys[pygame.K_RIGHT] == True or pressed_keys[dic["rgt"]]==True:
+            print pygame.K_RIGHT
             player1.move('right')
-        if pressed_keys[pygame.K_UP] == True:
+        if pressed_keys[pygame.K_UP] == True or pressed_keys[dic["up"]]==True:
             player1.move('up')
-        if pressed_keys[pygame.K_DOWN] == True:
+        if pressed_keys[pygame.K_DOWN] == True or pressed_keys[dic["dwn"]]==True:
             player1.move('down')
         if pressed_keys[pygame.K_p] == True:
             pause = True
@@ -203,7 +328,10 @@ def gameloop():
         
         if is_collided == False:
             #player is not touching anything
-        
+
+            if player1.x>600:
+                import map2
+
 
 
             if player1.speedx > 0:
@@ -484,6 +612,7 @@ def gameloop():
         
 	    #map draw-----------------------------------------------------------------------------------------------------
         button(pause_but,"pause",blue,hover_blue,black,'paused')
+        button(ans,"answer",blue,hover_blue,black,'answer')
         pygame.display.update()
         clock.tick(fps)
 
@@ -932,7 +1061,7 @@ def editloop():
 
         
 # main code
-pygame.display.toggle_fullscreen()
+#pygame.display.toggle_fullscreen()
 gameintro()
 if mode == 'play':
     gameinit()
