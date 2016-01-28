@@ -124,7 +124,7 @@ def chn_cont(action):
 	while save:
 		outfile = open('control.txt','w+')
 		if action != "svchn":
-			print "enter"
+			# print "enter"
 			for event in pygame.event.get():
 				#print(event)
 				if event.type == pygame.QUIT:
@@ -242,7 +242,7 @@ def gameinit():
 class tim_disp(threading.Thread):
 	def run(self):
 		for i in range(0,10):
-			print i
+			# print i
 			message(str(i),black,500,500,font)
 			
 			time.sleep(1)
@@ -332,7 +332,7 @@ def gameloop():
 		
 		if is_collided == False:
 			#player is not touching anything
-			print player1.x
+			# print player1.x
 			if player1.x >= map1.map_edge_x:
 				
 				import map2
@@ -506,7 +506,7 @@ def gameloop():
 		
 
 		#logic for line intersection
-
+		mcoords = point(pygame.mouse.get_pos()[0] ,pygame.mouse.get_pos()[1] )      
 		tempx = mcoords.x
 		tempy = mcoords.y 
 		tempcol = red
@@ -602,6 +602,7 @@ def gameloop():
 			#pygame.draw.line(gameDisplay,blue,(line2.x1,line2.y1),(line2.x2,line2.y2),2)
 			#pygame.draw.circle(gameDisplay,red,(int(final_point.x),int(final_point.y)),3,0)
 		pygame.draw.line(gameDisplay,line1.color,(line1.x1,line1.y1),(final_point.x,final_point.y),2)
+		# pygame.draw.line(gameDisplay,line1.color,(line1.x1,line1.y1),(tempx,tempy),2)
 
 		#update location of lines back to orignal
 		for l in lines:
@@ -684,14 +685,16 @@ def load_map(name):
 			ly2 = float(a[4])
 			ln = line(lx1,ly1,lx2,ly2)
 			ln.type = 'light'
-			ln.hidden = True
+			# ln.hidden = True
 
 			if lx2 != lx1:
 				lm = (ly2-ly1)/(lx2-lx1)
+				ln.slope = lm
+				
 			else:
+				ln.slope = float("inf")
 				ln.is_vertical = True
 			
-			ln.slope = lm
 			ln.length = ((lx2-lx1)**2 + (ly2-ly1)**2 )**0.5
 			lines.append(ln)
 
@@ -708,10 +711,11 @@ def load_map(name):
 
 			if lx2 != lx1:
 				lm = (ly2-ly1)/(lx2-lx1)
+				ln.slope = lm
 			else:
 				ln.is_vertical = True
 			
-			ln.slope = lm
+			
 			ln.length = ((lx2-lx1)**2 + (ly2-ly1)**2 )**0.5
 			lines.append(ln)
 
@@ -729,10 +733,11 @@ def load_map(name):
 			
 			if lx2 != lx1:
 				lm = (ly2-ly1)/(lx2-lx1)
+				ln.slope = lm
 			else:
 				ln.is_vertical = True
 			
-			ln.slope = lm
+			
 			ln.length = ((lx2-lx1)**2 + (ly2-ly1)**2 )**0.5
 			lines.append(ln)
 
@@ -775,7 +780,7 @@ def snap(mx,my):
 		my -= 1
 	return mx,my
 
-def move_all(dir,mapt,objs):
+def move_all(dir,mapt,objs,plyrx,plyry):
 	
 	cord = ''
 	value = 30
@@ -798,8 +803,10 @@ def move_all(dir,mapt,objs):
 		if o.name == 'wall':
 			if cord == 'x':
 				o.x += value
+				plyrx += value
 			if cord == 'y':
 				o.y += value
+				plyry += value
 
 		elif o.name == 'line':
 			if cord == 'x':
@@ -810,7 +817,7 @@ def move_all(dir,mapt,objs):
 				o.y2 += value
 			
 	
-	return mapt,objs
+	return mapt,objs,plyrx,plyry
 
 def reset_map(mapt,objs,display,typ):
 	
@@ -931,13 +938,13 @@ def editloop():
 		 
 
 				if event.key == pygame.K_LEFT:
-					mapt,objs = move_all('left',mapt,objs)
+					mapt,objs,plyrx,plyry = move_all('left',mapt,objs,plyrx,plyry)
 				if event.key == pygame.K_RIGHT:
-					mapt,objs = move_all('right',mapt,objs)
+					mapt,objs,plyrx,plyry = move_all('right',mapt,objs,plyrx,plyry)
 				if event.key == pygame.K_UP:
-					mapt,objs = move_all('up',mapt,objs)
+					mapt,objs,plyrx,plyry = move_all('up',mapt,objs,plyrx,plyry)
 				if event.key == pygame.K_DOWN:
-					mapt,objs = move_all('down',mapt,objs)
+					mapt,objs,plyrx,plyry = move_all('down',mapt,objs,plyrx,plyry)
 				if event.key == pygame.K_1:
 					mapt['w'] += 30
 				if event.key == pygame.K_2:
@@ -950,7 +957,7 @@ def editloop():
 
 				if event.key == pygame.K_s:
 					mapt,objs = reset_map(mapt,objs,display,'zero')
-					l1 = '0 ' + str(plyrx) + ' ' + str(plyry) +' ' + str(mapt['w']) + ' ' + str(mapt['h']) + '\n'
+					l1 = '0 ' + str(plyrx- display['x']) + ' ' + str(plyry- display['y']) +' ' + str(mapt['w']) + ' ' + str(mapt['h']) + '\n'
 					f = open('maps/level1.txt','w+')
 					f.seek(0,0)
 					f.write(l1)
@@ -983,6 +990,8 @@ def editloop():
 		message('Add answer line a: ',black,1100,210,font2)
 		message('Add Player location: p',black,1100,230,font2)
 		message('Save: s',black,1100,250,font2)
+		message('Outline all borders using',black,1100,270,font2)
+		message('light line (l)',black,1100,290,font2)
 
 		#draw already drawn objects first
 		for o in objs:
@@ -1048,7 +1057,7 @@ def editloop():
 			if selected_object == 'player':
 				pygame.draw.circle(gameDisplay,green,mcoords,3,0)
 				if mousepress == True:
-					plyrx = mcoords[0]
+					plyrx = mcoords[0] 
 					plyry = mcoords[1]
 
 		mousepress = False
